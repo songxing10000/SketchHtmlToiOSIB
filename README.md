@@ -20,7 +20,8 @@ view功能列表
 - [x] bgColor
 - [x] bg alpha
 - [ ] 嵌套子控件
+***
 imageView功能列表
 - [x] rect
 - [x] bg alpha
-***
+
