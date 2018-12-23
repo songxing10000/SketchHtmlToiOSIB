@@ -12,7 +12,7 @@
  */
 + (instancetype)objWithJSON:(id)json;
 /// 字典数组转模型数组
-+ (NSMutableArray *)modelsFromDicts:(NSArray<NSDictionary*>*)dicts;
++ (NSMutableArray *)objsFromDicts:(NSArray<NSDictionary*>*)dicts;
 
 
 /// 字典或者数组

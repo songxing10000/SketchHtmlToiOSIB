@@ -12,18 +12,18 @@
 @class NBSKObject;
 
 
-
-
 @implementation ViewController
-
+#pragma mark - view life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    NSString *htmlFilePath = @"/Users/dfpo/Downloads/222/index.html";
-    NBSKObject *skObj = [self readHtmlAtPath:htmlFilePath];
-    NSString *storyboardDestPath = @"/Users/dfpo/Downloads/temp.storyboard";
-    [self createSbDesPathAt:storyboardDestPath fromObj:skObj];
+    NSString *htmlFilePath = @"/Users/mac/Downloads/开元助手首页（趋势图）";
+    NSString *jsonStr = [self jsonStrWithHtmlFileAtPath:htmlFilePath];
+    NBSKObject *skObj = [NBSKObject objWithJSON:jsonStr];
+    NSString *storyboardDestPath = @"/Users/mac/Downloads/temp.storyboard";
+    [self createSBFileAtPath:storyboardDestPath withObj:skObj];
 }
+#pragma mark - getter and setter
 -(MBProgressHUD *)hud {
     if (_hud) {
         return _hud;

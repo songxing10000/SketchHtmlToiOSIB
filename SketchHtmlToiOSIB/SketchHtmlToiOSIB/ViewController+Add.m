@@ -10,10 +10,10 @@
 @implementation ViewController (Add)
 #pragma mark - read save xml
 
-- (NSXMLElement *)loadTemplateRootElementWithXmlFileName:(NSString *)xmlFileName {
-    return (NSXMLElement *)[self loadTemplateDocumentFromXmlFileName:xmlFileName].rootElement;
+- (NSXMLElement *)rootElementWithXmlFileName:(NSString *)xmlFileName {
+    return (NSXMLElement *)[self documentWithXmlFileName:xmlFileName].rootElement;
 }
-- (NSXMLDocument *)loadTemplateDocumentFromXmlFileName:(NSString *)xmlFileName {
+- (NSXMLDocument *)documentWithXmlFileName:(NSString *)xmlFileName {
     
     NSError *error = nil;
     
@@ -31,9 +31,47 @@
     NSXMLDocument *xmlDocument = [[NSXMLDocument alloc] initWithData:xmlData options:NSXMLNodePreserveWhitespace error:&error];
     return xmlDocument;
 }
-- (NBSKObject *)readHtmlAtPath:(NSString *)htmlFilePath {
+- (NSString *)getHtmlFilePathFromPath:(NSString *)htmlFilePath {
+    BOOL isDir = NO;
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL fileExists = [fm fileExistsAtPath:htmlFilePath isDirectory:&isDir];
+    if (!fileExists) {
+        NSLog(@"文件不存在 %@", htmlFilePath);
+        return nil;
+    }
+    NSString *rightHtmlFilePath = htmlFilePath.mutableCopy;
+    if (isDir) {
+        /// 尝试查找传入文件夹内的 index.html
+        // 获得当前文件夹path下面的所有内容（文件夹、文件）
+        NSError *error = nil;
+        NSArray<NSString *> *fileNames = [fm contentsOfDirectoryAtPath:htmlFilePath error:&error];
+        if (error) {
+            NSLog(@"出错了 %@", error);
+            return nil;
+        }
+        /// 目标文件名
+        NSString *desFileName = @"index.html";
+        fileExists = [fileNames containsObject: desFileName];
+        if (fileExists) {
+            rightHtmlFilePath = [htmlFilePath stringByAppendingPathComponent:@"index.html"];
+            return rightHtmlFilePath;
+        }
+    } else {
+        if (![[htmlFilePath pathExtension] isEqualToString:@"html"]) {
+            NSLog(@"应该传入html文件");
+            return nil;
+        }
+    }
+    return rightHtmlFilePath;
+}
+- (NSString *)jsonStrWithHtmlFileAtPath:(NSString *)htmlFilePath {
     
-    NSString *text = [NSString stringWithContentsOfFile:htmlFilePath encoding:NSUTF8StringEncoding error:nil];
+    NSString *rightHtmlFilePath = [self getHtmlFilePathFromPath:htmlFilePath];
+    if(!rightHtmlFilePath) {
+        NSLog(@"没找到html文件在路径 %@",htmlFilePath);
+        return nil;
+    }
+    NSString *text = [NSString stringWithContentsOfFile:rightHtmlFilePath encoding:NSUTF8StringEncoding error:nil];
     NSString *startStr = @"SMApp(";
     NSUInteger start = [text rangeOfString: startStr].location;
     if (start == NSNotFound) {
@@ -48,18 +86,20 @@
         return nil;
     }
     NSString *subString = [text substringWithRange:NSMakeRange(start, end - start)];
-    return [NBSKObject objWithJSON:subString] ;
+    return subString ;
 }
 
-- (void)createSbDesPathAt:(NSString *)sbDesPath fromObj:(NBSKObject *)object {
-    
-    NSXMLDocument *sbDocument = [self loadTemplateDocumentFromXmlFileName:@"sb"];
+- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object {
+    if (!sbDesPath || !object) {
+        return;
+    }
+    NSXMLDocument *sbDocument = [self documentWithXmlFileName:@"sb"];
     
     NSXMLElement *scenes =
-    [self getFirstElementName:@"scenes" FromElement:sbDocument.rootElement];
+    [self getFirstElementByName:@"scenes" FromElement:sbDocument.rootElement];
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
-        NSXMLElement *vcElement = [self getVcElement];
+        NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         for (SKLayer *view in views) {
             
@@ -81,30 +121,30 @@
             NSXMLElement *subViewElement;
             NSString *vcTitle;
             if ([viewType isEqualToString:@"text"]) {
-                NSXMLElement *labelElement = [self getlabelElement];
-                [self setRect:view.rect ForElement:labelElement];
-                [self setText:view.content ForElement:labelElement];
+                NSXMLElement *labelElement = [self getNewlabelElement];
+                [self setRect:view.rect forElement:labelElement];
+                [self setText:view.content forLableElement:labelElement];
                 //                [self setText:view.textAlign ForElement:labelElement];
-                [self setPointSize:view.fontSize ForElement:labelElement];
-                [self setTextColor:view.color.uiColor ForElement:labelElement];
+                [self setPointSize:view.fontSize forLabelElement:labelElement];
+                [self setTextColor:view.color.uiColor forLabelElement:labelElement];
                 subViewElement = labelElement;
                 if ([view.rect.y isEqualToString: @"31"]) {
                     //可能是标题
                     vcTitle = view.content;
                 }
             }else if ([viewType isEqualToString:@"slice"]) {//图片
-                NSXMLElement *imgElement = [self getImgVElement];
-                [self setRect:view.rect ForElement:imgElement];
+                NSXMLElement *imgElement = [self getNewImageViewElement];
+                [self setRect:view.rect forElement:imgElement];
                 // image="fff.png"
                 subViewElement = imgElement;
                 
             }else if ([viewType isEqualToString:@"shape"]) {//view
                 
-                NSXMLElement *viewElement = [self getViewElement];
-                [self setRect:view.rect ForElement:viewElement];
+                NSXMLElement *viewElement = [self getNewViewElement];
+                [self setRect:view.rect forElement:viewElement];
                 if (view.fills && view.fills.count > 0) {
                     
-                    [self setviewBgColor:view.fills[0].color.uiColor ForElement:viewElement];
+                    [self setBgColor:view.fills[0].color.uiColor forViewElement:viewElement];
                 }
                 if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
@@ -118,14 +158,14 @@
                 [self setAlpha:view.opacity ForElement:subViewElement];
             }
             if (vcTitle) {
-                [self setVCLable:vcTitle forVCElement:vcElement];
+                [self setLable:vcTitle forVCElement:vcElement];
             } else {
-                [self setVCLable:vc.name forVCElement:vcElement];
+                [self setLable:vc.name forVCElement:vcElement];
                 
             }
             if (subViewElement) {
                 
-                    [self addSubview:subViewElement inVC:vcElement fromSb:sbDocument];
+                    [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
                 
                 
             }
@@ -148,6 +188,7 @@
     
     if ( ![[NSFileManager defaultManager] fileExistsAtPath:destPath]) {
         if ( ![[NSFileManager defaultManager] createFileAtPath:destPath contents:nil attributes:nil]){
+            NSLog(@"创建文件失败 %@", destPath);
             return NO;
         }
     }
@@ -163,7 +204,7 @@
 }
 #pragma mark - get view add view
 
-- (void)addSubview:(NSXMLElement *)subViewElement inVC:(NSXMLElement *)vcElement fromSb:(NSXMLDocument *)sbDocument{
+- (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
         NSLog(@"未找到 %@", subViewElement);
         return;
@@ -172,16 +213,16 @@
         NSLog(@"未找到 %@", vcElement);
         return;
     }
-    NSXMLElement *object = [self getFirstElementName:@"objects" FromElement:vcElement];
-    NSXMLElement *vc = [self getFirstElementName:@"viewController" FromElement:object];
-    NSXMLElement *view = [self getFirstElementName:@"view" FromElement:vc];
-    NSXMLElement *subView = [self getFirstElementName:@"subviews" FromElement:view];
+    NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
+    NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
+    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
+    NSXMLElement *subView = [self getFirstElementByName:@"subviews" FromElement:view];
     [subView addChild:subViewElement];
     if ([subViewElement.name isEqualToString:@"imageView"]) {
         //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
         
         NSXMLElement *resources =
-        [self getFirstElementName:@"resources" FromElement:sbDocument.rootElement];
+        [self getFirstElementByName:@"resources" FromElement:sbDocument.rootElement];
         NSXMLElement *imageNode = [NSXMLElement elementWithName:@"image"];
         NSString *imgName = [subViewElement attributeForName:@"image"].stringValue;
         if (imgName && imgName.length > 0) {
@@ -194,40 +235,40 @@
         
     }
 }
-- (NSXMLElement *)getVcElement {
-    NSXMLElement *vcElement = [self loadTemplateRootElementWithXmlFileName:@"vc"];
-    [self setRandomIdFromElement:vcElement];
-    NSXMLElement *objects = [self getFirstElementName:@"objects" FromElement:vcElement];
-    NSXMLElement *placeholder = [self getFirstElementName:@"placeholder" FromElement:objects];
-    [self setRandomIdFromElement:placeholder];
+- (NSXMLElement *)getNewVCElement {
+    NSXMLElement *vcElement = [self rootElementWithXmlFileName:@"vc"];
+    [self setRandomIdForElement:vcElement];
+    NSXMLElement *objects = [self getFirstElementByName:@"objects" FromElement:vcElement];
+    NSXMLElement *placeholder = [self getFirstElementByName:@"placeholder" FromElement:objects];
+    [self setRandomIdForElement:placeholder];
     
-    NSXMLElement *viewController = [self getFirstElementName:@"viewController" FromElement:objects];
-    [self setRandomIdFromElement:viewController];
+    NSXMLElement *viewController = [self getFirstElementByName:@"viewController" FromElement:objects];
+    [self setRandomIdForElement:viewController];
     
     
-    NSXMLElement *view = [self getFirstElementName:@"view" FromElement:viewController];
-    [self setRandomIdFromElement:view];
-    NSXMLElement *viewLayoutGuide = [self getFirstElementName:@"viewLayoutGuide" FromElement:view];
-    [self setRandomIdFromElement:viewLayoutGuide];
+    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:viewController];
+    [self setRandomIdForElement:view];
+    NSXMLElement *viewLayoutGuide = [self getFirstElementByName:@"viewLayoutGuide" FromElement:view];
+    [self setRandomIdForElement:viewLayoutGuide];
     
     return vcElement.copy;
 }
-- (NSXMLElement *)getlabelElement {
-    NSXMLElement *lableElement = [self loadTemplateRootElementWithXmlFileName:@"label"];
-    [self setRandomIdFromElement:lableElement];
+- (NSXMLElement *)getNewlabelElement {
+    NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"label"];
+    [self setRandomIdForElement:lableElement];
     return lableElement.copy;
 }
-- (NSXMLElement *)getImgVElement {
-    NSXMLElement *imgVElement = [self loadTemplateRootElementWithXmlFileName:@"imgV"];
-    [self setRandomIdFromElement:imgVElement];
+- (NSXMLElement *)getNewImageViewElement {
+    NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imgV"];
+    [self setRandomIdForElement:imgVElement];
     return imgVElement.copy;
 }
-- (NSXMLElement *)getViewElement {
-    NSXMLElement *viewElement = [self loadTemplateRootElementWithXmlFileName:@"view"];
-    [self setRandomIdFromElement:viewElement];
+- (NSXMLElement *)getNewViewElement {
+    NSXMLElement *viewElement = [self rootElementWithXmlFileName:@"view"];
+    [self setRandomIdForElement:viewElement];
     return viewElement.copy;
 }
-- (void)setRandomIdFromElement:(NSXMLElement *)element {
+- (void)setRandomIdForElement:(NSXMLElement *)element {
     NSArray<NSXMLNode *> *nodes = element.attributes;
     NSString *name = [element.name isEqualToString:@"scene"]?@"sceneID":@"id";
     for (NSXMLNode *node in nodes) {
@@ -240,7 +281,7 @@
 
 
 
-- (NSXMLElement *)getFirstElementName:(NSString *)elementName FromElement:(NSXMLElement *)element {
+- (NSXMLElement *)getFirstElementByName:(NSString *)elementName FromElement:(NSXMLElement *)element {
     NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[element elementsForName:elementName];
     if (elements.count >= 1) {
         return elements[0];
@@ -254,8 +295,8 @@
     [element addChild:add.copy];
     return add ;
 }
-- (void)setRect:(SKRect *)rect ForElement:(NSXMLElement *)element{
-    NSXMLElement *rectElement = [self getFirstElementName:@"rect" FromElement:(NSXMLElement *)element];
+- (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element{
+    NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
@@ -274,7 +315,7 @@
         }
     }
 }
--(void)setText:(NSString *)text ForElement:(NSXMLElement *)element{
+-(void)setText:(NSString *)text forLableElement:(NSXMLElement *)element{
     
     NSArray<NSXMLNode *> *nodes = element.attributes;
     for (NSXMLNode *node in nodes) {
@@ -292,7 +333,7 @@
 }
 
 
--(void)setTextAlign:(NSString *)textAlign ForElement:(NSXMLElement *)element{
+-(void)setTextAlign:(NSString *)textAlign forLabelElement:(NSXMLElement *)element{
     
     NSArray<NSXMLNode *> *nodes = element.attributes;
     for (NSXMLNode *node in nodes) {
@@ -302,8 +343,8 @@
         }
     }
 }
-- (void)setPointSize:(NSString *)pointSize ForElement:(NSXMLElement *)element{
-    NSXMLElement *rectElement = [self getFirstElementName:@"fontDescription" FromElement:(NSXMLElement *)element];
+- (void)setPointSize:(NSString *)pointSize forLabelElement:(NSXMLElement *)element{
+    NSXMLElement *rectElement = [self getFirstElementByName:@"fontDescription" FromElement:(NSXMLElement *)element];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"pointSize"]) {
@@ -312,6 +353,9 @@
     }
 }
 -(void)setColor:(NSString *)textColor type:(NSString *)type ForElement:(NSXMLElement *)element {
+    if (!textColor) {
+        return;
+    }
     NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[element elementsForName:@"color"];
     NSXMLElement *desElement;
     for (NSXMLElement *colorE in elements) {
@@ -356,35 +400,33 @@
         
     }
 }
--(void)setTextColor:(NSString *)textColor ForElement:(NSXMLElement *)element {
+-(void)setTextColor:(NSString *)textColor forLabelElement:(NSXMLElement *)element {
     [self setColor:textColor type:@"textColor" ForElement:element];
 }
--(void)setviewBgColor:(NSString *)viewBgColor ForElement:(NSXMLElement *)element {
-    if (!viewBgColor) {
-        return;
-    }
+-(void)setBgColor:(NSString *)viewBgColor forViewElement:(NSXMLElement *)element {
     [self setColor:viewBgColor type:@"backgroundColor" ForElement:element];
 
 }
 -(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element {
+     #pragma mark - to do
     // ["border: 1px solid #295DFD;","border-radius: 4px;"]
     [css enumerateObjectsUsingBlock:^(NSString * _Nonnull str, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([str hasPrefix:@"border:"]) {
-            
+           
         } else if ([str hasPrefix:@"border-radius:"]) {
             
         }
     }];
 }
--(void)setVCLable:(NSString *)text forVCElement:(NSXMLElement *)element {
-    NSXMLElement *objects =  [self getFirstElementName:@"objects" FromElement:element];
-     NSXMLElement *viewController =  [self getFirstElementName:@"viewController" FromElement:objects];
+-(void)setLable:(NSString *)text forVCElement:(NSXMLElement *)element {
+    NSXMLElement *objects =  [self getFirstElementByName:@"objects" FromElement:element];
+     NSXMLElement *viewController =  [self getFirstElementByName:@"viewController" FromElement:objects];
     
     NSString *key = @"userLabel";
     [self setValue:text forKey:key forElement:viewController];
 }
 - (void)setValue:(NSString *)value forKey:(NSString *)key  forElement:(NSXMLElement *)element {
-    if (!key || !value) {
+    if (!key || !value || !element) {
         return;
     }
     BOOL hasAlphaKey = [element attributeForName: key].name.length;
@@ -419,8 +461,8 @@
 }
 #pragma mark - other
 
-- (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString{
-    if (jsonString == nil) {
+- (NSDictionary *)dicWithJsonStr:(NSString *)jsonString{
+    if (!jsonString) {
         return nil;
     }
     

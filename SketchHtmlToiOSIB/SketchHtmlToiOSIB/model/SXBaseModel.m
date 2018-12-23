@@ -35,7 +35,7 @@
 
     return [[self class] yy_modelWithJSON:json];
 }
-+ (NSMutableArray *)modelsFromDicts:(NSArray<NSDictionary*>*)dicts {
++ (NSMutableArray *)objsFromDicts:(NSArray<NSDictionary*>*)dicts {
     __block NSArray *temArr = nil;
     if ([dicts isKindOfClass:[NSArray class]]) {
         
