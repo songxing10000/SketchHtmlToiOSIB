@@ -53,5 +53,13 @@
     _hud = hud;
     return _hud;
 }
+-(NSMutableDictionary<NSString *,NSNumber *> *)labelCountDict {
+    if (_labelCountDict) {
+        return _labelCountDict;
+    }
+    NSMutableDictionary *labelCountDict = @{}.mutableCopy;
+    _labelCountDict = labelCountDict;
+    return _labelCountDict;
+}
 @end
 

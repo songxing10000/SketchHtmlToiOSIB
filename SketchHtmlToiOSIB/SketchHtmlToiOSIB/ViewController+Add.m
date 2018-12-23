@@ -109,7 +109,7 @@
             if (view.rect.x.intValue <= 16 &&
                 view.rect.y.intValue <= 36 &&
                 view.rect.width.intValue <= 9 &&
-                view.rect.height.intValue <= 20 ) {
+                view.rect.height.intValue <= 26 ) {
                 /// 不添加把返回按钮
                 continue;
             } else if (view.rect.y.intValue < 20 &&
@@ -130,7 +130,8 @@
                 [self setPointSize:view.fontSize forLabelElement:labelElement];
                 [self setTextColor:view.color.uiColor forLabelElement:labelElement];
                 
-                if ([view.rect.y isEqualToString: @"31"]) {
+                if ([view.rect.y isEqualToString: @"30"]||
+                    [view.rect.y isEqualToString: @"31"]) {
                     //可能是标题
                     vcTitle = view.content;
                 }
@@ -178,6 +179,13 @@
         [scenes addChild: vcElement];
         self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
+        if (scenes.childCount == object.artboards.count) {
+            NSLog(@"----%@---", @"写入完成");
+            [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
+
+            [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
+        }
+    
     }
     
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
@@ -206,12 +214,6 @@
         NSLog(@"Could not write document out...");
         return NO;
     }
-    NSLog(@"输出成功：%@",destPath);
-//    [[NSWorkspace sharedWorkspace] selectFile:destPath inFileViewerRootedAtPath:destPath];
-
-    [[NSWorkspace sharedWorkspace] openFile:destPath withApplication:@"Xcode"];
-    
-
     return YES;
 }
 #pragma mark - get view add view
@@ -228,8 +230,25 @@
     NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
     NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
     NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
-    NSXMLElement *subView = [self getFirstElementByName:@"subviews" FromElement:view];
-    [subView addChild:subViewElement];
+    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
+    /// 限制加入子控件的个数
+//    if (subViewSuperView.childCount > 80) {
+        if ([subViewElement.name isEqualToString:@"label"]) {
+            NSString *labelText = [subViewElement attributeForName:@"text"].stringValue;
+            NSNumber *preCount = self.labelCountDict[labelText];
+            if (!preCount || [preCount isEqual:@0]) {
+                self.labelCountDict[labelText] = @1;
+            } else {
+                self.labelCountDict[labelText] = @(preCount.intValue + 1);
+            }
+            if (self.labelCountDict[labelText].intValue > 80) {
+                NSLog(@"--%@--%@---", @"添加太多一样的label了", labelText);
+                return;
+            }
+        }
+//    }
+    
+    [subViewSuperView addChild:subViewElement];
 /// 暂不处理图片信息
     return;
     if ([subViewElement.name isEqualToString:@"imageView"]) {
