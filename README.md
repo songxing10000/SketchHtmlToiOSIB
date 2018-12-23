@@ -14,6 +14,7 @@ vc功能列表
 - [x] 加入view、label、imageView控件
 - [ ] 加入table、cell控件
 - [ ] 加入scrollView控件
+- [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 label功能列表
 - [x] rect
