@@ -17,8 +17,9 @@ vc功能列表
 - [x] 根据title生成控制器sb中的label
 - [x] 加入view、label、imageView控件
 - [ ] 使用原生nav，导航栏，未移除，所有子控件y上移调整
-- [ ] 加入table、cell控件
 - [ ] 加入scrollView控件
+- [ ] 自动识别控件重叠，转换为button控件
+- [ ] 自动识别控件复用，转换为table控件
 - [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 label功能列表
