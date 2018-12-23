@@ -6,22 +6,41 @@
 //  Copyright © 2018 dfpo. All rights reserved.
 //
 
-#import "ViewController.h"
-#import "ViewController+Add.h"
-
 @class NBSKObject;
 
+#import "ViewController.h"
+#import "ViewController+Add.h"
+#import "XMDragView.h"
+#import "XMFileItem.h"
 
+@interface ViewController()<XMDragViewDelegate>
+
+
+@end
 @implementation ViewController
 #pragma mark - view life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    NSString *htmlFilePath = @"/Users/mac/Downloads/开元助手首页（趋势图）";
+    
+}
+#pragma mark - XMDragViewDelegate
+- (void)dragView:(XMDragView *)dragView didDragItems:(NSArray *)items
+{
+    NSString *htmlFilePath = items[0];
     NSString *jsonStr = [self jsonStrWithHtmlFileAtPath:htmlFilePath];
     NBSKObject *skObj = [NBSKObject objWithJSON:jsonStr];
-    NSString *storyboardDestPath = @"/Users/mac/Downloads/temp.storyboard";
+    NSString *storyboardDestPath = [[self desktopFolderFilePath] stringByAppendingPathComponent:@"temp.storyboard"];
     [self createSBFileAtPath:storyboardDestPath withObj:skObj];
+}
+- (NSString*)desktopFolderFilePath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    if (!basePath) {
+        NSLog(@"----%@---", @"没有找到桌面位置");
+        return nil;
+    }
+    return basePath;
 }
 #pragma mark - getter and setter
 -(MBProgressHUD *)hud {

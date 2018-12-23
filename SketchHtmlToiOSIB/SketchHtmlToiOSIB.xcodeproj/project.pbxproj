@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0921CF566200F7A999 /* XMDragView.m */; };
+		041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0B21CF588F00F7A999 /* XMFileItem.m */; };
 		980BF50421CF03670035FF08 /* label.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF4FF21CF03670035FF08 /* label.xml */; };
 		980BF50521CF03670035FF08 /* sb.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50021CF03670035FF08 /* sb.xml */; };
 		980BF50621CF03670035FF08 /* imgV.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50121CF03670035FF08 /* imgV.xml */; };
@@ -25,6 +27,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		041C6D0821CF566200F7A999 /* XMDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDragView.h; sourceTree = "<group>"; };
+		041C6D0921CF566200F7A999 /* XMDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDragView.m; sourceTree = "<group>"; };
+		041C6D0B21CF588F00F7A999 /* XMFileItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMFileItem.m; sourceTree = "<group>"; };
+		041C6D0C21CF588F00F7A999 /* XMFileItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMFileItem.h; sourceTree = "<group>"; };
 		19FF10D1413BFF328D13470B /* libPods-SketchHtmlToiOSIB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SketchHtmlToiOSIB.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		980BF4FF21CF03670035FF08 /* label.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = label.xml; sourceTree = "<group>"; };
 		980BF50021CF03670035FF08 /* sb.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sb.xml; sourceTree = "<group>"; };
@@ -65,6 +71,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		041C6D0721CF565600F7A999 /* view */ = {
+			isa = PBXGroup;
+			children = (
+				041C6D0C21CF588F00F7A999 /* XMFileItem.h */,
+				041C6D0B21CF588F00F7A999 /* XMFileItem.m */,
+				041C6D0821CF566200F7A999 /* XMDragView.h */,
+				041C6D0921CF566200F7A999 /* XMDragView.m */,
+			);
+			path = view;
+			sourceTree = "<group>";
+		};
 		7DCF1F46BEA263FA437ACF72 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +148,7 @@
 		9815BDC021CD47E10048AD13 /* SketchHtmlToiOSIB */ = {
 			isa = PBXGroup;
 			children = (
+				041C6D0721CF565600F7A999 /* view */,
 				980BF50B21CF03C00035FF08 /* model */,
 				980BF4FE21CF03670035FF08 /* xml */,
 				9815BDC421CD47E10048AD13 /* ViewController.h */,
@@ -186,7 +204,7 @@
 						CreatedOnToolsVersion = 10.1;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -260,8 +278,10 @@
 				981D4E2321CE564F00B16508 /* SXBaseModel.m in Sources */,
 				9815BDC621CD47E10048AD13 /* ViewController.m in Sources */,
 				981D4E2F21CE719000B16508 /* ViewController+Add.m in Sources */,
+				041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */,
 				9815BDCE21CD47E20048AD13 /* main.m in Sources */,
 				981D4E2621CE575C00B16508 /* NBSKObject.m in Sources */,
+				041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */,
 				9815BDC321CD47E10048AD13 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -396,7 +416,6 @@
 			baseConfigurationReference = B2384C27C4335DDC8345C4A8 /* Pods-SketchHtmlToiOSIB.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = SketchHtmlToiOSIB/SketchHtmlToiOSIB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/SketchHtmlToiOSIB/Info.plist";
@@ -404,7 +423,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-22.xibMac";
+				PRODUCT_BUNDLE_IDENTIFIER = songxing.SketchHtmlToiOSIB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -414,7 +433,6 @@
 			baseConfigurationReference = E364D36D459E3B8570E3B3AB /* Pods-SketchHtmlToiOSIB.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = SketchHtmlToiOSIB/SketchHtmlToiOSIB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/SketchHtmlToiOSIB/Info.plist";
@@ -422,7 +440,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-22.xibMac";
+				PRODUCT_BUNDLE_IDENTIFIER = songxing.SketchHtmlToiOSIB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

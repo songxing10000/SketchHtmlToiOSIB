@@ -190,9 +190,12 @@
     if (XMLDoucment == nil) {
         return NO;
     }
-    
-    if ( ![[NSFileManager defaultManager] fileExistsAtPath:destPath]) {
-        if ( ![[NSFileManager defaultManager] createFileAtPath:destPath contents:nil attributes:nil]){
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL fileExist = [fm fileExistsAtPath:destPath];
+    if ( fileExist) {
+        [fm removeItemAtPath:destPath error:nil];
+    } else {
+        if ( ![fm createFileAtPath:destPath contents:nil attributes:nil]){
             NSLog(@"创建文件失败 %@", destPath);
             return NO;
         }
@@ -204,7 +207,11 @@
         return NO;
     }
     NSLog(@"输出成功：%@",destPath);
+//    [[NSWorkspace sharedWorkspace] selectFile:destPath inFileViewerRootedAtPath:destPath];
+
+    [[NSWorkspace sharedWorkspace] openFile:destPath withApplication:@"Xcode"];
     
+
     return YES;
 }
 #pragma mark - get view add view
