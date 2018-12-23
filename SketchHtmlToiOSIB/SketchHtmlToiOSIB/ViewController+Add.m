@@ -113,13 +113,15 @@
                 /// 不添加把返回按钮
                 continue;
             } else if (view.rect.y.intValue < 20 &&
-                view.rect.height.intValue <= 20 ) {
+                       view.rect.height.intValue <= 20 ) {
                 // 不添加状态栏上的控件
                 continue;
             }
+            /// 控件类别 text为lable， slice为图片，shape为view
             NSString *viewType = view.type;
             NSXMLElement *subViewElement;
             NSString *vcTitle;
+#pragma mark - UILabel
             if ([viewType isEqualToString:@"text"]) {
                 NSXMLElement *labelElement = [self getNewlabelElement];
                 [self setRect:view.rect forElement:labelElement];
@@ -127,18 +129,24 @@
                 //                [self setText:view.textAlign ForElement:labelElement];
                 [self setPointSize:view.fontSize forLabelElement:labelElement];
                 [self setTextColor:view.color.uiColor forLabelElement:labelElement];
-                subViewElement = labelElement;
+                
                 if ([view.rect.y isEqualToString: @"31"]) {
                     //可能是标题
                     vcTitle = view.content;
                 }
+                /// 字的正常、中等、粗
+                [self setTextRegularMediumBold:view.fontFace forLabelElement:labelElement];
+                subViewElement = labelElement;
             }else if ([viewType isEqualToString:@"slice"]) {//图片
+#pragma mark - UIImageView
+                
                 NSXMLElement *imgElement = [self getNewImageViewElement];
                 [self setRect:view.rect forElement:imgElement];
                 // image="fff.png"
                 subViewElement = imgElement;
                 
             }else if ([viewType isEqualToString:@"shape"]) {//view
+#pragma mark - UIView
                 
                 NSXMLElement *viewElement = [self getNewViewElement];
                 [self setRect:view.rect forElement:viewElement];
@@ -161,23 +169,20 @@
                 [self setLable:vcTitle forVCElement:vcElement];
             } else {
                 [self setLable:vc.name forVCElement:vcElement];
-                
             }
             if (subViewElement) {
                 
-                    [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
-                
-                
+                [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
             }
         }
         [scenes addChild: vcElement];
-        self.hud.progress = scenes.childCount/object.artboards.count;
+        self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
     }
     
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
     [self.hud hide:YES];
-
+    
 }
 /// 输出storyboard
 - (BOOL)saveXMLDoucment:(NSXMLDocument *)XMLDoucment toPath:(NSString *)destPath {
@@ -218,21 +223,22 @@
     NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
     NSXMLElement *subView = [self getFirstElementByName:@"subviews" FromElement:view];
     [subView addChild:subViewElement];
+/// 暂不处理图片信息
+    return;
     if ([subViewElement.name isEqualToString:@"imageView"]) {
         //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
         
-        NSXMLElement *resources =
-        [self getFirstElementByName:@"resources" FromElement:sbDocument.rootElement];
         NSXMLElement *imageNode = [NSXMLElement elementWithName:@"image"];
         NSString *imgName = [subViewElement attributeForName:@"image"].stringValue;
+        
         if (imgName && imgName.length > 0) {
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"name" stringValue: imgName]];
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"width" stringValue:@"16"]];
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
+            NSXMLElement *resources =
+            [self getFirstElementByName:@"resources" FromElement:sbDocument.rootElement];
             [resources addChild:imageNode.copy];
         }
-        
-        
     }
 }
 - (NSXMLElement *)getNewVCElement {
@@ -316,13 +322,8 @@
     }
 }
 -(void)setText:(NSString *)text forLableElement:(NSXMLElement *)element{
-    
-    NSArray<NSXMLNode *> *nodes = element.attributes;
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"text"]) {
-            [node setStringValue: text];
-        }
-    }
+    NSString *key = @"text";
+    [self setValue: text forKey: key forElement: element];
 }
 -(void)setAlpha:(NSString *)alpha ForElement:(NSXMLElement *)element{
     if ([alpha isEqualToString:@"1"]) {
@@ -334,26 +335,24 @@
 
 
 -(void)setTextAlign:(NSString *)textAlign forLabelElement:(NSXMLElement *)element{
-    
-    NSArray<NSXMLNode *> *nodes = element.attributes;
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"textAlignment"]) {
-//            [node setStringValue: text];
-#pragma mark - to do
-        }
-    }
+    #pragma mark - to do
+    __unused NSString *key = @"textAlignment";
+//    [self setValue:textAlign forKey:key forElement:element];
 }
 - (void)setPointSize:(NSString *)pointSize forLabelElement:(NSXMLElement *)element{
-    NSXMLElement *rectElement = [self getFirstElementByName:@"fontDescription" FromElement:(NSXMLElement *)element];
-    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"pointSize"]) {
-            [node setStringValue: pointSize];
-        }
+    NSString *input = pointSize;
+    BOOL hasValue = input && input.length > 0;
+    if (!hasValue) {
+        return;
     }
+    NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:(NSXMLElement *)element];
+    NSString *key = @"pointSize";
+    [self setValue:pointSize forKey:key forElement:fontDescription];
 }
 -(void)setColor:(NSString *)textColor type:(NSString *)type ForElement:(NSXMLElement *)element {
-    if (!textColor) {
+    NSString *input = textColor;
+    BOOL hasValue = input && input.length > 0;
+    if (!hasValue) {
         return;
     }
     NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[element elementsForName:@"color"];
@@ -403,24 +402,30 @@
 -(void)setTextColor:(NSString *)textColor forLabelElement:(NSXMLElement *)element {
     [self setColor:textColor type:@"textColor" ForElement:element];
 }
+
 -(void)setBgColor:(NSString *)viewBgColor forViewElement:(NSXMLElement *)element {
     [self setColor:viewBgColor type:@"backgroundColor" ForElement:element];
-
+    
 }
 -(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element {
-     #pragma mark - to do
+#pragma mark - to do
     // ["border: 1px solid #295DFD;","border-radius: 4px;"]
     [css enumerateObjectsUsingBlock:^(NSString * _Nonnull str, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([str hasPrefix:@"border:"]) {
-           
+            
         } else if ([str hasPrefix:@"border-radius:"]) {
             
         }
     }];
 }
 -(void)setLable:(NSString *)text forVCElement:(NSXMLElement *)element {
+    NSString *input = text;
+    BOOL hasValue = input && input.length > 0;
+    if (!hasValue) {
+        return;
+    }
     NSXMLElement *objects =  [self getFirstElementByName:@"objects" FromElement:element];
-     NSXMLElement *viewController =  [self getFirstElementByName:@"viewController" FromElement:objects];
+    NSXMLElement *viewController =  [self getFirstElementByName:@"viewController" FromElement:objects];
     
     NSString *key = @"userLabel";
     [self setValue:text forKey:key forElement:viewController];
@@ -429,10 +434,13 @@
     if (!key || !value || !element) {
         return;
     }
-    BOOL hasAlphaKey = [element attributeForName: key].name.length;
-    NSDictionary *alphaDic = @{key:value};
-    if (hasAlphaKey) {
-        [element setAttributesAsDictionary: alphaDic];
+    BOOL hasKey = [element attributeForName: key].name.length;
+    if (hasKey) {
+        NSString *valueStr = [element attributeForName: key].stringValue;
+        if ([value isEqualToString:valueStr]) {
+            return;
+        }
+        [element setAttributesAsDictionary: @{key:value}];
     } else {
         [element addAttribute:[NSXMLNode attributeWithName:key stringValue: value]];
     }
@@ -477,5 +485,27 @@
         return nil;
     }
     return dic;
+}
+- (void)setTextRegularMediumBold:(NSString *)style forLabelElement:(NSXMLElement *)labelElement {
+    NSString *fontStyleName = style;
+    if (fontStyleName && fontStyleName.length > 0) {
+        NSString *regularStr = @"Regular";
+        NSString *mediumStr = @"Medium";
+        NSString *boldStr = @"Bold";
+        if([fontStyleName hasSuffix: regularStr]) {
+            fontStyleName = regularStr;
+            /// 默认就是system，不用再次设置
+            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
+            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
+        } else  if([fontStyleName hasSuffix: mediumStr]) {
+            fontStyleName = mediumStr;
+        } else if([fontStyleName hasSuffix: boldStr]) {
+            fontStyleName = boldStr;
+            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
+        }
+    }
 }
 @end
