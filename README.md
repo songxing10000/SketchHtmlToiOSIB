@@ -28,6 +28,7 @@ label功能列表
 - [x] text
 - [x] textColor
 - [x] fontSize
+- [ ] 宽高自适应，目前有挤压理解，暂处理为给宽度增加额外长度。
 ***
 view功能列表
 - [x] rect
