@@ -19,7 +19,7 @@ view功能列表
 - [x] rect
 - [x] bgColor
 - [x] bg alpha
-- [ ] 嵌套子控件
+- [ ] 嵌套子控件（目前Sketch全是平级，没有嵌套子控件）
 ***
 imageView功能列表
 - [x] rect
