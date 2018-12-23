@@ -1,6 +1,10 @@
 # SketchHtmlToiOSIB
 ***
-转换格式列表
+转换文件来源
+- [x] 本地文件
+- [ ] 网络url
+***
+输出格式
 - [x] sb格式
 - [ ] xib格式
 - [ ] 手码格式
@@ -14,6 +18,7 @@ vc功能列表
 - [x] 加入view、label、imageView控件
 - [ ] 加入table、cell控件
 - [ ] 加入scrollView控件
+- [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 label功能列表
 - [x] rect
