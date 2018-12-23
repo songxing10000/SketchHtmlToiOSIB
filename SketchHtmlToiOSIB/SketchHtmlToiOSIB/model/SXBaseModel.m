@@ -1,8 +1,8 @@
 
-#import "NBaseModel.h"
-#import "NSObject+YYModel.h"
+#import "SXBaseModel.h"
+#import <YYModel.h>
 
-@implementation NBaseModel
+@implementation SXBaseModel
 +(instancetype)new {
     return [[self alloc] init];
 }
@@ -33,7 +33,7 @@
         }];
     }
 
-    return [[self class] modelWithJSON:json];
+    return [[self class] yy_modelWithJSON:json];
 }
 + (NSMutableArray *)modelsFromDicts:(NSArray<NSDictionary*>*)dicts {
     __block NSArray *temArr = nil;
@@ -51,16 +51,16 @@
             }
         }];
     }
-    return [NSArray modelArrayWithClass:[self class] json:temArr].mutableCopy;
+    return [NSArray yy_modelArrayWithClass:[self class] json:temArr].mutableCopy;
 }
 - (NSString *)description {
-    return [self modelDescription];
+    return [self yy_modelDescription];
 }
 - (id)dict {
-    return [self modelToJSONObject];
+    return [self yy_modelToJSONObject];
 }
 -(NSString *)JSONString {
-    return [self modelToJSONString];
+    return [self yy_modelToJSONString];
 
 }
 @end

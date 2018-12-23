@@ -7,9 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <MBProgressHUD.h>
 
 @interface ViewController : NSViewController
 
+@property(nonatomic, strong) MBProgressHUD *hud;
 
 @end
 

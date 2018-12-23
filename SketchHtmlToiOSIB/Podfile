@@ -1,0 +1,10 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :osx, '10.14'
+inhibit_all_warnings!
+
+target "SketchHtmlToiOSIB" do
+    
+	pod 'MBProgressHUD-OSX', '~> 0.0.1', :inhibit_warnings => true
+	pod 'YYModel', '~> 1.0.4', :inhibit_warnings => true
+  
+end

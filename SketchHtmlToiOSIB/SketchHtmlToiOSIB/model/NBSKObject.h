@@ -1,8 +1,8 @@
 
-#import "NBaseModel.h"
+#import "SXBaseModel.h"
 
 
-@interface SKRect :NBaseModel
+@interface SKRect :SXBaseModel
 @property (nonatomic , copy) NSString              *x;
 @property (nonatomic , copy) NSString              *y;
 @property (nonatomic , copy) NSString              *width;
@@ -11,7 +11,7 @@
 @end
 
 
-@interface SKColor :NBaseModel
+@interface SKColor :SXBaseModel
 /// 182
 @property (nonatomic , assign) NSInteger              r;
 /// 183
@@ -31,7 +31,7 @@
 
 @end
 
-@interface SKBorder :NBaseModel
+@interface SKBorder :SXBaseModel
 /// 如 color
 @property (nonatomic , copy) NSString              * fillType;
 /// 如 center
@@ -43,13 +43,13 @@
 @property (nonatomic , strong) SKColor * color;
 
 @end
-@interface SKFill :NBaseModel
+@interface SKFill :SXBaseModel
 /// 如 color
 @property (nonatomic , copy) NSString              * fillType;
 @property (nonatomic , strong) SKColor * color;
 
 @end
-@interface SKShadow :NBaseModel
+@interface SKShadow :SXBaseModel
 /// 如 outer
 @property (nonatomic , copy) NSString              * type;
 @property (nonatomic , copy) NSString              * offsetX;
@@ -60,7 +60,7 @@
 @property (nonatomic , strong) SKColor * color;
 
 @end
-@interface SKLayer :NBaseModel
+@interface SKLayer :SXBaseModel
 @property (nonatomic , copy) NSString              * objectID;
 /// 控件类别 text为lable， slice为图片，shape为view
 @property (nonatomic , copy) NSString              * type;
@@ -94,12 +94,12 @@
 @end
 
 
-@interface NotesItem :NBaseModel
+@interface NotesItem :SXBaseModel
 
 @end
 
 
-@interface ArtboardsItem :NBaseModel
+@interface ArtboardsItem :SXBaseModel
 /// 控件集合
 @property (nonatomic , strong) NSArray <SKLayer *>              * layers;
 @property (nonatomic , copy) NSString              * pageName;
@@ -117,7 +117,7 @@
 
 
 
-@interface ExportableItem :NBaseModel
+@interface ExportableItem :SXBaseModel
 /// 图片名
 @property (nonatomic , copy) NSString              * name;
 /// 图片格式 ，如，png
@@ -128,7 +128,7 @@
 @end
 
 
-@interface SlicesItem :NBaseModel
+@interface SlicesItem :SXBaseModel
 /// 图片名
 @property (nonatomic , copy) NSString              * name;
 @property (nonatomic , copy) NSString              * objectID;
@@ -138,12 +138,12 @@
 @end
 
 
-@interface ColorsItem :NBaseModel
+@interface ColorsItem :SXBaseModel
 
 @end
 
 
-@interface NBSKObject :NBaseModel
+@interface NBSKObject :SXBaseModel
 /// 1
 @property (nonatomic , copy) NSString              * scale;
 /// px

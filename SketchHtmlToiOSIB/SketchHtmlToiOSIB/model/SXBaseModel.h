@@ -1,7 +1,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NBaseModel : NSObject
+@interface SXBaseModel : NSObject
 
 /// [[self alloc] init];
 +(instancetype)new;
