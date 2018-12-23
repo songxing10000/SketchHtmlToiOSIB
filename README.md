@@ -20,6 +20,7 @@ vc功能列表
 - [ ] 加入scrollView控件
 - [ ] 自动识别控件重叠，转换为button控件
 - [ ] 自动识别控件复用，转换为table控件
+- [ ] 大控件遮住了小控件，调整控件层级功能
 - [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 label功能列表
