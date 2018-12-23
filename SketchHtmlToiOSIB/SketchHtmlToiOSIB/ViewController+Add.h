@@ -37,13 +37,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// 背景alpha
 -(void)setAlpha:(NSString *)alpha ForElement:(NSXMLElement *)element;
 
+/**
+ 从css里提取一些属性，当bg颜色没有时，这里可能会出现一些border或者渐变色之类的相关属性
+ */
 -(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element;
-/// 页面在sb中的label
+
+/**
+ 页面在sb中的label
+
+ @param text label
+ @param element 页面元素
+ */
 -(void)setLable:(NSString *)text forVCElement:(NSXMLElement *)element;
 #pragma mark - id
 -(NSString *)randomid;
 #pragma mark - other
-
 - (NSDictionary *)dicWithJsonStr:(NSString *)jsonString;
 @end
 
