@@ -101,8 +101,22 @@
     for (ArtboardsItem *vc in object.artboards) {
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
+        /// 设计稿 375*667
+        CGFloat screenH = 667;
+        NSArray<NSString *> *viewYs = [views valueForKeyPath:@"rect.y"];
+        NSArray<NSString *> *viewHs = [views valueForKeyPath:@"rect.height"];
+        NSMutableArray<NSNumber *> *maxYs = [NSMutableArray array];
+        [viewYs enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSString * _Nonnull y, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSInteger aY = viewHs[idx].integerValue + y.integerValue;
+            [maxYs addObject:@(aY)];
+        }];
+        
+        CGFloat max =[[maxYs valueForKeyPath:@"@max.floatValue"] floatValue];
+        if (screenH < max) {
+            // 这里可以先添加一个scrollView在根view上，再添加其他子控件
+        }
+        
         for (SKLayer *view in views) {
-            
             if (!view.objectID) {
                 continue;
             }
