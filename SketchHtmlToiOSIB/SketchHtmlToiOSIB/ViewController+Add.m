@@ -110,10 +110,30 @@
             NSInteger aY = viewHs[idx].integerValue + y.integerValue;
             [maxYs addObject:@(aY)];
         }];
-        
+
         CGFloat max =[[maxYs valueForKeyPath:@"@max.floatValue"] floatValue];
         if (screenH < max) {
             // 这里可以先添加一个scrollView在根view上，再添加其他子控件
+            
+            NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
+            NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
+            NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[vc elementsForName:@"size"];
+            NSXMLElement *size;
+            NSString *maxStr = @(max+20).stringValue;
+            if (elements.count >= 1) {
+                size =  elements[0];
+                [self setValue:@"freeformSize" forKey:@"key" forElement:size];
+                [self setValue:@"375" forKey:@"width" forElement:size];
+                [self setValue: maxStr forKey:@"height" forElement:size];
+            } else {
+                size = [NSXMLElement elementWithName:@"size"];
+                [self setValue:@"freeformSize" forKey:@"key" forElement:size];
+                [self setValue:@"375" forKey:@"width" forElement:size];
+                [self setValue: maxStr forKey:@"height" forElement:size];
+                [vc addChild:size];
+            }
+            
+            
         }
         
         for (SKLayer *view in views) {
