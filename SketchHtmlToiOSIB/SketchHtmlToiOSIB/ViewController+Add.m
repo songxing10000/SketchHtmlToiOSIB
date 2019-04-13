@@ -162,8 +162,12 @@
                 [self setText:view.content forLableElement:labelElement];
                 //                [self setText:view.textAlign ForElement:labelElement];
                 [self setPointSize:view.fontSize forLabelElement:labelElement];
-                [self setTextColor:view.color.uiColor forLabelElement:labelElement];
-                
+                /// 这里用 r g b a除 255 更精准
+                /// 之前用 view.color.uiColor (r:0.77 g:0.77 b:0.77 a:1.00)
+                /// 丢失了精准
+                NSString *newColor = [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
+                [self setTextColor: newColor//view.color.uiColor
+                   forLabelElement:labelElement];
                 if ([view.rect.y isEqualToString: @"30"]||
                     [view.rect.y isEqualToString: @"31"]) {
                     //可能是标题
