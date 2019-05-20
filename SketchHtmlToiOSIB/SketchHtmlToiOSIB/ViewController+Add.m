@@ -556,20 +556,60 @@
         NSString *regularStr = @"Regular";
         NSString *mediumStr = @"Medium";
         NSString *boldStr = @"Bold";
-        if([fontStyleName hasSuffix: regularStr]) {
-            fontStyleName = regularStr;
-            /// 默认就是system，不用再次设置
-            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
-            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
-            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
-        } else  if([fontStyleName hasSuffix: mediumStr]) {
-            fontStyleName = mediumStr;
-        } else if([fontStyleName hasSuffix: boldStr]) {
-            fontStyleName = boldStr;
-            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+        /*
+         label xml 中没有添加  type="system" ，如果添加以下两种字体会涉及删除 type="system" 这个东西，所以如果是系统的就加上这个key更容易处理，目前UI给的全是苹方字体
+         苹方-简 常规体  PingFangSC-Regular
+         <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="17"/>
+         苹方-简 中黑体  PingFangSC-Medium
+         <fontDescription key="fontDescription" name="PingFangSC-Medium" family="PingFang SC" pointSize="17"/>
+         苹方-简 中粗体
+         <fontDescription key="fontDescription" name="PingFangSC-Semibold" family="PingFang SC" pointSize="17"/>
+         */
+        if([fontStyleName isEqualToString: @"PingFangSC-Regular"]) {
             NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
-            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
+            [self setValue:@"PingFangSC-Regular" forKey:@"name" forElement:fontDescription];
+            [self setValue:@"PingFang SC" forKey:@"family" forElement:fontDescription];
+
+        } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"]) {
+            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            [self setValue:@"PingFangSC-Medium" forKey: @"name" forElement:fontDescription];
+            [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
+
+        } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
+            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            [self setValue:@"PingFangSC-Semibold" forKey: @"name" forElement:fontDescription];
+            [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
+        } else if([fontStyleName isEqualToString: @"DINAlternate-Bold"]) {
+            /*
+             <fontDescription key="fontDescription" name="DINAlternate-Bold" family="DIN Alternate" pointSize="16"/>
+             */
+            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            [self setValue:@"DINAlternate-Bold" forKey: @"name" forElement:fontDescription];
+            [self setValue:@"DIN Alternate" forKey: @"family" forElement:fontDescription];
+        } else if([fontStyleName isEqualToString: @"Helvetica"]) {
+            /*
+             <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="16"/>
+             */
+            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            [self setValue:@"Helvetica" forKey: @"name" forElement:fontDescription];
+            [self setValue:@"Helvetica" forKey: @"family" forElement:fontDescription];
+        } else {
+            NSLog(@"找不到字体：%@", fontStyleName);
         }
+//            if([fontStyleName hasSuffix: regularStr]) {
+//            fontStyleName = regularStr;
+//            /// 默认就是system，不用再次设置
+//            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
+//            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+//            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
+//        } else  if([fontStyleName hasSuffix: mediumStr]) {
+//            fontStyleName = mediumStr;
+//        } else if([fontStyleName hasSuffix: boldStr]) {
+//            fontStyleName = boldStr;
+//            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+//            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+//            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
+//        }
     }
 }
 @end
