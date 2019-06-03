@@ -67,7 +67,7 @@ label功能列表
 - [x] 识别 苹方-简 中粗体  PingFangSC-Semibold
 - [x] 识别 Helvetica
 - [x] 识别 DINAlternate-Bold
-- [ ] 宽高自适应，目前有挤压理解，暂处理为给宽度增加额外长度。
+- [ ] 宽高自适应，目前有挤压现象，暂处理为给宽度增加额外长度。
 ***
 view功能列表
 - [x] rect
