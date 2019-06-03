@@ -1,7 +1,22 @@
 # SketchHtmlToiOSIB
+## 如何使用
+1.把美工给的Sketch的网页存至本地，当然有时美工给的就是压缩包，就省去了下载这一步
 
-![](SketchPage.png)
+2.运行本程序
+
+3.把1中存的网页的html拖入程序面板
+
+4.生成 temp.storyboard 至桌面
+
+最终如图
+
+![](fastUse.png)
+
+
+
 ## 转换成你的storyboard
+![](SketchPage.png)
+
 ![](SbPage.png)
 
 这个东西有啥用 ？
