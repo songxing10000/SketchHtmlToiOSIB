@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -41,14 +41,14 @@
 
 /* Begin PBXFileReference section */
 		04DB37400B1261F13BEA677E466F2568 /* Pods-SketchHtmlToiOSIB.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SketchHtmlToiOSIB.debug.xcconfig"; sourceTree = "<group>"; };
-		1BDEA659E2D9AF442E4AE8E5B87DE3C9 /* libYYModel.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libYYModel.a; path = libYYModel.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BDEA659E2D9AF442E4AE8E5B87DE3C9 /* libYYModel.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libYYModel.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E6538EF805C81D9425EF3D70568C722 /* YYClassInfo.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YYClassInfo.m; path = YYModel/YYClassInfo.m; sourceTree = "<group>"; };
 		3F4899DABCD0D35CD4E40E582CE2BF3B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		49FE47A4D9326AAFB5F79D83C77123C4 /* YYModel-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "YYModel-dummy.m"; sourceTree = "<group>"; };
 		508B5281FDCE691A98EAE611849C922A /* Pods-SketchHtmlToiOSIB-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SketchHtmlToiOSIB-dummy.m"; sourceTree = "<group>"; };
 		5513100A5C07895BDFB918B3CEE49F35 /* MBProgressHUD-OSX-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MBProgressHUD-OSX-prefix.pch"; sourceTree = "<group>"; };
 		571D644C7897C9314728EAE08CAE1D4E /* MBProgressHUD-OSX-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "MBProgressHUD-OSX-dummy.m"; sourceTree = "<group>"; };
-		61E38B019DF69BD667DCB363A2A66583 /* libMBProgressHUD-OSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libMBProgressHUD-OSX.a"; path = "libMBProgressHUD-OSX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		61E38B019DF69BD667DCB363A2A66583 /* libMBProgressHUD-OSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libMBProgressHUD-OSX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		63CCFB61D4E4D24DDD6E37226EED9060 /* MBProgressHUD.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Classes/MBProgressHUD.m; sourceTree = "<group>"; };
 		65A59D586CE4AAE872F858D434ED4C53 /* Pods-SketchHtmlToiOSIB.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SketchHtmlToiOSIB.release.xcconfig"; sourceTree = "<group>"; };
 		75319276DACE4EEA816CC3CC904FA786 /* YYModel.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = YYModel.xcconfig; sourceTree = "<group>"; };
@@ -57,8 +57,8 @@
 		812EE35ACC3B5FBDE890CE83B1248EEA /* YYModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YYModel.h; path = YYModel/YYModel.h; sourceTree = "<group>"; };
 		85F9F2ED7BFDDFCA1B5D5BDF0FC4FC7C /* YYClassInfo.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YYClassInfo.h; path = YYModel/YYClassInfo.h; sourceTree = "<group>"; };
 		87958D45E329AC6C2B893B36EA538836 /* Pods-SketchHtmlToiOSIB-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SketchHtmlToiOSIB-resources.sh"; sourceTree = "<group>"; };
-		8855A9EA8B50329C7102928219F0C2C7 /* libPods-SketchHtmlToiOSIB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-SketchHtmlToiOSIB.a"; path = "libPods-SketchHtmlToiOSIB.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		8855A9EA8B50329C7102928219F0C2C7 /* libPods-SketchHtmlToiOSIB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SketchHtmlToiOSIB.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		93A62656B6F6BE2E33D13706DF27E7CD /* YYModel-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "YYModel-prefix.pch"; sourceTree = "<group>"; };
 		A91FEB6DD7B7FCF0B0E4E79AA09B582E /* MBProgressHUD-OSX.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "MBProgressHUD-OSX.xcconfig"; sourceTree = "<group>"; };
 		AFD6E2CE1FDB0C1B6CCF0EEA19DE08C0 /* Pods-SketchHtmlToiOSIB-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SketchHtmlToiOSIB-frameworks.sh"; sourceTree = "<group>"; };
@@ -106,7 +106,6 @@
 				812EE35ACC3B5FBDE890CE83B1248EEA /* YYModel.h */,
 				DA69A10D33D02D90B8B5661829E2A213 /* Support Files */,
 			);
-			name = YYModel;
 			path = YYModel;
 			sourceTree = "<group>";
 		};
@@ -167,7 +166,6 @@
 				63CCFB61D4E4D24DDD6E37226EED9060 /* MBProgressHUD.m */,
 				7D5813CD8FA2279B5E38ABC6955DF314 /* Support Files */,
 			);
-			name = "MBProgressHUD-OSX";
 			path = "MBProgressHUD-OSX";
 			sourceTree = "<group>";
 		};
@@ -304,14 +302,15 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0930;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1020;
 			};
 			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
 			productRefGroup = B5E870A25160A32713CA8E31092DE4FE /* Products */;
@@ -466,6 +465,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -549,6 +549,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
