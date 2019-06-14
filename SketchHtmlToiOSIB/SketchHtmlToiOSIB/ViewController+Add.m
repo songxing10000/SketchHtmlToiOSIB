@@ -210,8 +210,30 @@
                 [self setLable:vc.name forVCElement:vcElement];
             }
             if (subViewElement) {
-                
-                [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
+                NSArray<NSXMLElement *> *vcSubElements = [self getSubViewElementInVCElement:vcElement];
+                NSMutableArray<SKRect *> *vcSubSKRs = [NSMutableArray array];
+                for (NSXMLElement *vcSubElement in vcSubElements) {
+                    [vcSubSKRs addObject: [self getRectFromElement:vcSubElement]];
+                }
+                SKRect *desSR = [self getRectFromElement:subViewElement];
+                CGRect subR = CGRectMake(desSR.x.floatValue, desSR.y.floatValue, desSR.width.floatValue, desSR.height.floatValue);
+                BOOL hasFind = NO;
+                for (SKRect *vcSubSKR in vcSubSKRs) {
+                    
+                    CGRect superR = CGRectMake(vcSubSKR.x.floatValue, vcSubSKR.y.floatValue, vcSubSKR.width.floatValue, vcSubSKR.height.floatValue);
+                    
+                    if ( CGRectContainsRect(superR, subR) ) {
+                        hasFind = YES;
+                        [self moveSubviewElement:subViewElement toSuperViewElement:vcSubElements[[vcSubSKRs indexOfObject:vcSubSKR]]];
+                        break;
+                    }
+                    
+                }
+                if (!hasFind) {
+                    
+                    // 有子控件加入到控制器的view内
+                    [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
+                }
             }
         }
         [scenes addChild: vcElement];
@@ -255,7 +277,47 @@
     return YES;
 }
 #pragma mark - get view add view
+/// 移动子元素到父元素内，添加子view到其父view上
+- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement {
+    
+    if (!subViewElement) {
+        NSLog(@"未找到 %@", subViewElement);
+        return;
+    }
+    if (!superViewElement) {
+        NSLog(@"未找到 %@", superViewElement);
+        return;
+    }
+    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement: superViewElement];
+    if ([superViewElement.name isEqualToString:@"label"] ||
+        [superViewElement.name isEqualToString:@"imgV"] ||
+        [superViewElement.name isEqualToString:@"btn"]) {
+        
+        return;
+    }
+    SKRect *oldSuperR = [self getRectFromElement:superViewElement];
 
+    SKRect *oldSelfR = [self getRectFromElement:subViewElement];
+    /// 更新 移动到父控件里的x y
+    oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
+    oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
+    
+    [self setRect:oldSelfR forElement:subViewElement];
+    // 考虑 更新 x y
+    [subViewSuperView addChild:subViewElement];
+
+}
+- (NSArray<NSXMLElement *> *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
+    if (!vcElement) {
+        NSLog(@"未找到 %@", vcElement);
+        return @[];
+    }
+    NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
+    NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
+    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
+    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
+    return subViewSuperView.children;
+}
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
         NSLog(@"未找到 %@", subViewElement);
@@ -352,7 +414,7 @@
 
 
 - (NSXMLElement *)getFirstElementByName:(NSString *)elementName FromElement:(NSXMLElement *)element {
-    NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[element elementsForName:elementName];
+    NSArray<NSXMLElement *> *elements = [element elementsForName:elementName];
     if (elements.count >= 1) {
         return elements[0];
     }
@@ -365,6 +427,28 @@
     [element addChild:add.copy];
     return add ;
 }
+
+/// 获取某个元素的 frame
+- (SKRect *)getRectFromElement:(NSXMLElement *)element{
+
+    SKRect *skr = [SKRect new];
+    NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
+    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: @"x"]) {
+            skr.x = node.stringValue;
+        } else if ([node.name isEqualToString: @"y"]) {
+            skr.y = node.stringValue;
+        } else if ([node.name isEqualToString: @"width"]) {
+            skr.width = node.stringValue;
+        } else if ([node.name isEqualToString: @"height"]) {
+            skr.height = node.stringValue;
+        }
+    }
+
+    return skr;
+}
+/// 设置某个元素的 frame
 - (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element{
     NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
@@ -553,9 +637,6 @@
 - (void)setTextRegularMediumBold:(NSString *)style forLabelElement:(NSXMLElement *)labelElement {
     NSString *fontStyleName = style;
     if (fontStyleName && fontStyleName.length > 0) {
-        NSString *regularStr = @"Regular";
-        NSString *mediumStr = @"Medium";
-        NSString *boldStr = @"Bold";
         /*
          label xml 中没有添加  type="system" ，如果添加以下两种字体会涉及删除 type="system" 这个东西，所以如果是系统的就加上这个key更容易处理，目前UI给的全是苹方字体
          苹方-简 常规体  PingFangSC-Regular
