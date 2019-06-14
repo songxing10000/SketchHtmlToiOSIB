@@ -57,8 +57,6 @@ vc功能列表
 - [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 label功能列表
-- [x] rect
-- [x] bg alpha
 - [x] text
 - [x] textColor
 - [x] fontSize
@@ -73,9 +71,7 @@ view功能列表
 - [x] rect
 - [x] bgColor
 - [x] bg alpha
-- [ ] 嵌套子控件（目前Sketch全是平级，没有嵌套子控件）
+- [x] 目前仅支持一次嵌套(即只能往根view的子view里加入子控件)
 ***
 imageView功能列表
-- [x] rect
-- [x] bg alpha
 
