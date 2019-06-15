@@ -162,6 +162,9 @@
             if ([viewType isEqualToString:@"text"]) {
                 NSXMLElement *labelElement = [self getNewlabelElement];
                 [self setRect:view.rect forElement:labelElement];
+                if ([view.content isEqualToString: @"跟进"]) {
+                    NSLog(@"---%@---",@"fd");
+                }
                 [self setText:view.content forLableElement:labelElement];
                 //                [self setText:view.textAlign ForElement:labelElement];
                 [self setPointSize:view.fontSize forLabelElement:labelElement];
@@ -223,7 +226,9 @@
                 BOOL hasSuperViewInRootView = NO;
                 for (SKRect *rootViewSubViewSKRect in rootViewSubViewSKRects) {
                     
-                    CGRect superViewInRootViewCGRect = [self getCGRectFromSKRect:rootViewSubViewSKRect];
+                    CGRect superViewInRootViewCGRect =
+                        [self getCGRectFromSKRect:rootViewSubViewSKRect];
+                    
                     if ( CGRectContainsRect(superViewInRootViewCGRect, aNewWillBeAddedViewRect) ) {
                         hasSuperViewInRootView = YES;
                         
@@ -234,39 +239,39 @@
                             rootViewSubViewElements[findedSuperViewIdx];
                         
                         /// 再找一找父控件里，又包含自己的真正父控件
-//                        NSArray<NSXMLElement *> *superViewInRootViewSubElements =
-//                        [self getSubViewElementInElement: superViewInRootViewElement];
+                        NSArray<NSXMLElement *> *superViewInRootViewSubElements =
+                        [self getSubViewElementInElement: superViewInRootViewElement];
+//
+                        NSMutableArray<SKRect *> *superViewInRootViewSubSKRects = [NSMutableArray array];
+                        for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
+                            [superViewInRootViewSubSKRects addObject: [self getSKRectFromElement: superViewInRootViewSubElement]];
+                        }
+                        /// 在父控件里又有父控件
+                        BOOL hasSuperViewInSuperView = NO;
+                        for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
+//
+                            CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
 ////
-//                        NSMutableArray<SKRect *> *superViewInRootViewSubSKRects = [NSMutableArray array];
-//                        for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
-//                            [superViewInRootViewSubSKRects addObject: [self getSKRectFromElement: superViewInRootViewSubElement]];
-//                        }
-//                        /// 在父控件里又有父控件
-//                        BOOL hasSuperViewInSuperView = NO;
-//                        for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
+                            if ( CGRectContainsRect(superViewInSuperViewCGRect, aNewWillBeAddedViewRect) ) {
+                                hasSuperViewInSuperView = YES;
 //
-//                            CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
-////
-//                            if ( CGRectContainsRect(superViewInSuperViewCGRect, aNewWillBeAddedViewRect) ) {
-//                                hasSuperViewInSuperView = YES;
+                                NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSubSKRects indexOfObject:superViewInRootViewSubSKRect];
+                                NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
+                                [self moveSubviewElement: aNewWillBeAddedViewElement
+                                      toSuperViewElement: findedSuperViewInSuperViewElement];
+                                break;
+                            }
 //
-//                                NSUInteger findedSuperViewIdx2 = [findedSuperViewSubSKRs indexOfObject:findedSuperViewSubSKR];
-//                                NSXMLElement *findedSuperViewElement2 = findedSuperViewSubElements[findedSuperViewIdx2];
-//                                [self moveSubviewElement:subViewElement
-//                                      toSuperViewElement:findedSuperViewElement2];
-//                                break;
-//                            }
-//
-//                        }
-//                        if (!hasSuperViewInSuperView) {
+                        }
+                        if (!hasSuperViewInSuperView) {
 //                            //  在根view下面没有找到了父控件，就加入到根view下
-//                            [self moveSubviewElement:subViewElement
-//                                  toSuperViewElement:findedSuperViewElement];
-//                        } else {
-//                            NSLog(@"---%@---",@"ff");
-//                        }
-                        [self moveSubviewElement: aNewWillBeAddedViewElement
-                              toSuperViewElement: superViewInRootViewElement];
+                            
+                            [self moveSubviewElement: aNewWillBeAddedViewElement
+                                  toSuperViewElement: superViewInRootViewElement];
+                        } else {
+                            NSLog(@"---%@---",@"ff");
+                        }
+                        
                         break;
                     }
                     
@@ -335,11 +340,12 @@
     }
     NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement: superViewElement];
     if ([superViewElement.name isEqualToString:@"label"] ||
-        [superViewElement.name isEqualToString:@"imgV"] ||
-        [superViewElement.name isEqualToString:@"btn"]) {
+        [superViewElement.name isEqualToString:@"imageView"] ||
+        [superViewElement.name isEqualToString:@"button"]) {
         
         return;
     }
+    NSLog(@"--ccccccccc-%@---", superViewElement.name);
     SKRect *oldSuperR = [self getSKRectFromElement:superViewElement];
     
     SKRect *oldSelfR = [self getSKRectFromElement:subViewElement];
@@ -443,6 +449,7 @@
     [self setRandomIdForElement:lableElement];
     return lableElement.copy;
 }
+/// name imageView"
 - (NSXMLElement *)getNewImageViewElement {
     NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imgV"];
     [self setRandomIdForElement:imgVElement];
