@@ -260,6 +260,24 @@
                                 [self moveSubviewElement: aNewWillBeAddedViewElement
                                       toSuperViewElement: findedSuperViewInSuperViewElement];
                                 break;
+                            } else  {
+                                SKRect *oldSuperR = [self getSKRectFromElement:superViewInRootViewElement];
+                                SKRect *oldSelfR = [self getSKRectFromElement:aNewWillBeAddedViewElement];
+                                oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
+                                oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
+                                
+                                /// 放入的新控件，可以当做现在某个子控件的父控件
+                                if ( CGRectContainsRect(aNewWillBeAddedViewRect, [self getCGRectFromSKRect:oldSelfR]) ) {
+                                    // 把之前的控件，移动到新控件内
+                                    NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSubSKRects indexOfObject:superViewInRootViewSubSKRect];
+                                    NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
+                                    // todo 将之前的移动到新的上
+//                                    NSXMLElement *aNew = findedSuperViewInSuperViewElement.copy;
+//                                    [self setRandomIdForElement:aNew];
+//                                    [self moveSubviewElement: aNew
+//                                          toSuperViewElement: aNewWillBeAddedViewElement];
+                                    break;
+                                }
                             }
 //
                         }
