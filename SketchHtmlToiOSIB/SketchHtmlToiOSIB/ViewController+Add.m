@@ -40,7 +40,14 @@
         return nil;
     }
     NSString *rightHtmlFilePath = htmlFilePath.mutableCopy;
-    if (isDir) {
+    if (!isDir) {
+        
+        if (![[htmlFilePath pathExtension] isEqualToString:@"html"]) {
+            NSLog(@"应该传入html文件");
+            return nil;
+        }
+        
+    } else {
         /// 尝试查找传入文件夹内的 index.html
         // 获得当前文件夹path下面的所有内容（文件夹、文件）
         NSError *error = nil;
@@ -55,11 +62,6 @@
         if (fileExists) {
             rightHtmlFilePath = [htmlFilePath stringByAppendingPathComponent:@"index.html"];
             return rightHtmlFilePath;
-        }
-    } else {
-        if (![[htmlFilePath pathExtension] isEqualToString:@"html"]) {
-            NSLog(@"应该传入html文件");
-            return nil;
         }
     }
     return rightHtmlFilePath;
@@ -110,7 +112,7 @@
             NSInteger aY = viewHs[idx].integerValue + y.integerValue;
             [maxYs addObject:@(aY)];
         }];
-
+        
         CGFloat max =[[maxYs valueForKeyPath:@"@max.floatValue"] floatValue];
         if (screenH < max) {
             // 这里可以先添加一个scrollView在根view上，再添加其他子控件
@@ -153,7 +155,8 @@
             }
             /// 控件类别 text为lable， slice为图片，shape为view
             NSString *viewType = view.type;
-            NSXMLElement *subViewElement;
+            /// 将要被添加的新的 view NSXMLElement 对象
+            NSXMLElement *aNewWillBeAddedViewElement;
             NSString *vcTitle;
 #pragma mark - UILabel
             if ([viewType isEqualToString:@"text"]) {
@@ -175,14 +178,14 @@
                 }
                 /// 字的正常、中等、粗
                 [self setTextRegularMediumBold:view.fontFace forLabelElement:labelElement];
-                subViewElement = labelElement;
+                aNewWillBeAddedViewElement = labelElement;
             }else if ([viewType isEqualToString:@"slice"]) {//图片
 #pragma mark - UIImageView
                 
                 NSXMLElement *imgElement = [self getNewImageViewElement];
                 [self setRect:view.rect forElement:imgElement];
                 // image="fff.png"
-                subViewElement = imgElement;
+                aNewWillBeAddedViewElement = imgElement;
                 
             }else if ([viewType isEqualToString:@"shape"]) {//view
 #pragma mark - UIView
@@ -196,43 +199,85 @@
                 if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
                 }
-                subViewElement = viewElement;
+                aNewWillBeAddedViewElement = viewElement;
                 
             } else {
                 NSLog(@"--未知类型--%@---", viewType);
             }
             if (view.opacity) {
-                [self setAlpha:view.opacity ForElement:subViewElement];
+                [self setAlpha:view.opacity ForElement:aNewWillBeAddedViewElement];
             }
             if (vcTitle) {
                 [self setLable:vcTitle forVCElement:vcElement];
             } else {
                 [self setLable:vc.name forVCElement:vcElement];
             }
-            if (subViewElement) {
-                NSArray<NSXMLElement *> *vcSubElements = [self getSubViewElementInVCElement:vcElement];
-                NSMutableArray<SKRect *> *vcSubSKRs = [NSMutableArray array];
-                for (NSXMLElement *vcSubElement in vcSubElements) {
-                    [vcSubSKRs addObject: [self getRectFromElement:vcSubElement]];
+            if (aNewWillBeAddedViewElement) {
+                NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement];
+                NSMutableArray<SKRect *> *rootViewSubViewSKRects = [NSMutableArray array];
+                for (NSXMLElement *rootViewSubViewElement in rootViewSubViewElements) {
+                    [rootViewSubViewSKRects addObject: [self getSKRectFromElement:rootViewSubViewElement]];
                 }
-                SKRect *desSR = [self getRectFromElement:subViewElement];
-                CGRect subR = CGRectMake(desSR.x.floatValue, desSR.y.floatValue, desSR.width.floatValue, desSR.height.floatValue);
-                BOOL hasFind = NO;
-                for (SKRect *vcSubSKR in vcSubSKRs) {
+                /// 将要被添加的新的 view NSXMLElement 对象的 CGRect值
+                CGRect aNewWillBeAddedViewRect = [self getCGRectFromElement: aNewWillBeAddedViewElement];;
+                BOOL hasSuperViewInRootView = NO;
+                for (SKRect *rootViewSubViewSKRect in rootViewSubViewSKRects) {
                     
-                    CGRect superR = CGRectMake(vcSubSKR.x.floatValue, vcSubSKR.y.floatValue, vcSubSKR.width.floatValue, vcSubSKR.height.floatValue);
-                    
-                    if ( CGRectContainsRect(superR, subR) ) {
-                        hasFind = YES;
-                        [self moveSubviewElement:subViewElement toSuperViewElement:vcSubElements[[vcSubSKRs indexOfObject:vcSubSKR]]];
+                    CGRect superViewInRootViewCGRect = [self getCGRectFromSKRect:rootViewSubViewSKRect];
+                    if ( CGRectContainsRect(superViewInRootViewCGRect, aNewWillBeAddedViewRect) ) {
+                        hasSuperViewInRootView = YES;
+                        
+                        NSUInteger findedSuperViewIdx =
+                            [rootViewSubViewSKRects indexOfObject: rootViewSubViewSKRect];
+                        
+                        NSXMLElement *superViewInRootViewElement =
+                            rootViewSubViewElements[findedSuperViewIdx];
+                        
+                        /// 再找一找父控件里，又包含自己的真正父控件
+//                        NSArray<NSXMLElement *> *superViewInRootViewSubElements =
+//                        [self getSubViewElementInElement: superViewInRootViewElement];
+////
+//                        NSMutableArray<SKRect *> *superViewInRootViewSubSKRects = [NSMutableArray array];
+//                        for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
+//                            [superViewInRootViewSubSKRects addObject: [self getSKRectFromElement: superViewInRootViewSubElement]];
+//                        }
+//                        /// 在父控件里又有父控件
+//                        BOOL hasSuperViewInSuperView = NO;
+//                        for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
+//
+//                            CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
+////
+//                            if ( CGRectContainsRect(superViewInSuperViewCGRect, aNewWillBeAddedViewRect) ) {
+//                                hasSuperViewInSuperView = YES;
+//
+//                                NSUInteger findedSuperViewIdx2 = [findedSuperViewSubSKRs indexOfObject:findedSuperViewSubSKR];
+//                                NSXMLElement *findedSuperViewElement2 = findedSuperViewSubElements[findedSuperViewIdx2];
+//                                [self moveSubviewElement:subViewElement
+//                                      toSuperViewElement:findedSuperViewElement2];
+//                                break;
+//                            }
+//
+//                        }
+//                        if (!hasSuperViewInSuperView) {
+//                            //  在根view下面没有找到了父控件，就加入到根view下
+//                            [self moveSubviewElement:subViewElement
+//                                  toSuperViewElement:findedSuperViewElement];
+//                        } else {
+//                            NSLog(@"---%@---",@"ff");
+//                        }
+                        [self moveSubviewElement: aNewWillBeAddedViewElement
+                              toSuperViewElement: superViewInRootViewElement];
                         break;
                     }
                     
                 }
-                if (!hasFind) {
-                    
-                    // 有子控件加入到控制器的view内
-                    [self addSubviewElement:subViewElement inVCElement:vcElement fromSbDocument:sbDocument];
+                if (!hasSuperViewInRootView) {
+                    //  在根view下面没有找到了父控件，就加入到根view下
+                    [self addSubviewElement:aNewWillBeAddedViewElement
+                                inVCElement:vcElement
+                             fromSbDocument:sbDocument];
+                } else {
+                    NSLog(@"---%@---",@"ff");
                 }
             }
         }
@@ -242,10 +287,10 @@
         if (scenes.childCount == object.artboards.count) {
             NSLog(@"----%@---", @"写入完成");
             [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
-
+            
             [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
         }
-    
+        
     }
     
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
@@ -295,9 +340,9 @@
         
         return;
     }
-    SKRect *oldSuperR = [self getRectFromElement:superViewElement];
-
-    SKRect *oldSelfR = [self getRectFromElement:subViewElement];
+    SKRect *oldSuperR = [self getSKRectFromElement:superViewElement];
+    
+    SKRect *oldSelfR = [self getSKRectFromElement:subViewElement];
     /// 更新 移动到父控件里的x y
     oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
     oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
@@ -305,7 +350,7 @@
     [self setRect:oldSelfR forElement:subViewElement];
     // 考虑 更新 x y
     [subViewSuperView addChild:subViewElement];
-
+    
 }
 - (NSArray<NSXMLElement *> *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
     if (!vcElement) {
@@ -316,6 +361,14 @@
     NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
     NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
     NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
+    return subViewSuperView.children;
+}
+- (NSArray<NSXMLElement *> *)getSubViewElementInElement:(NSXMLElement *)viewElement {
+    if (!viewElement) {
+        NSLog(@"未找到 %@", viewElement);
+        return @[];
+    }
+    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement: viewElement];
     return subViewSuperView.children;
 }
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
@@ -332,24 +385,24 @@
     NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
     NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
     /// 限制加入子控件的个数
-//    if (subViewSuperView.childCount > 80) {
-        if ([subViewElement.name isEqualToString:@"label"]) {
-            NSString *labelText = [subViewElement attributeForName:@"text"].stringValue;
-            NSNumber *preCount = self.labelCountDict[labelText];
-            if (!preCount || [preCount isEqual:@0]) {
-                self.labelCountDict[labelText] = @1;
-            } else {
-                self.labelCountDict[labelText] = @(preCount.intValue + 1);
-            }
-            if (self.labelCountDict[labelText].intValue > 80) {
-                NSLog(@"--%@--%@---", @"添加太多一样的label了", labelText);
-                return;
-            }
+    //    if (subViewSuperView.childCount > 80) {
+    if ([subViewElement.name isEqualToString:@"label"]) {
+        NSString *labelText = [subViewElement attributeForName:@"text"].stringValue;
+        NSNumber *preCount = self.labelCountDict[labelText];
+        if (!preCount || [preCount isEqual:@0]) {
+            self.labelCountDict[labelText] = @1;
+        } else {
+            self.labelCountDict[labelText] = @(preCount.intValue + 1);
         }
-//    }
+        if (self.labelCountDict[labelText].intValue > 80) {
+            NSLog(@"--%@--%@---", @"添加太多一样的label了", labelText);
+            return;
+        }
+    }
+    //    }
     
     [subViewSuperView addChild:subViewElement];
-/// 暂不处理图片信息
+    /// 暂不处理图片信息
     return;
     if ([subViewElement.name isEqualToString:@"imageView"]) {
         //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
@@ -429,8 +482,8 @@
 }
 
 /// 获取某个元素的 frame
-- (SKRect *)getRectFromElement:(NSXMLElement *)element{
-
+- (SKRect *)getSKRectFromElement:(NSXMLElement *)element{
+    
     SKRect *skr = [SKRect new];
     NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
@@ -445,8 +498,18 @@
             skr.height = node.stringValue;
         }
     }
-
+    
     return skr;
+}
+- (CGRect)getCGRectFromElement:(NSXMLElement *)element{
+    
+    SKRect *desSR = [self  getSKRectFromElement:element];
+    return [self getCGRectFromSKRect:desSR];
+}
+- (CGRect)getCGRectFromSKRect:(SKRect *)desSR {
+    CGRect rect =
+    CGRectMake(desSR.x.floatValue, desSR.y.floatValue, desSR.width.floatValue, desSR.height.floatValue);
+    return rect;
 }
 /// 设置某个元素的 frame
 - (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element{
@@ -483,9 +546,9 @@
 
 
 -(void)setTextAlign:(NSString *)textAlign forLabelElement:(NSXMLElement *)element{
-    #pragma mark - to do
+#pragma mark - to do
     __unused NSString *key = @"textAlignment";
-//    [self setValue:textAlign forKey:key forElement:element];
+    //    [self setValue:textAlign forKey:key forElement:element];
 }
 - (void)setPointSize:(NSString *)pointSize forLabelElement:(NSXMLElement *)element{
     NSString *input = pointSize;
@@ -650,12 +713,12 @@
             NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
             [self setValue:@"PingFangSC-Regular" forKey:@"name" forElement:fontDescription];
             [self setValue:@"PingFang SC" forKey:@"family" forElement:fontDescription];
-
+            
         } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"]) {
             NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
             [self setValue:@"PingFangSC-Medium" forKey: @"name" forElement:fontDescription];
             [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
-
+            
         } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
             NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
             [self setValue:@"PingFangSC-Semibold" forKey: @"name" forElement:fontDescription];
@@ -677,20 +740,20 @@
         } else {
             NSLog(@"找不到字体：%@", fontStyleName);
         }
-//            if([fontStyleName hasSuffix: regularStr]) {
-//            fontStyleName = regularStr;
-//            /// 默认就是system，不用再次设置
-//            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
-//            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
-//            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
-//        } else  if([fontStyleName hasSuffix: mediumStr]) {
-//            fontStyleName = mediumStr;
-//        } else if([fontStyleName hasSuffix: boldStr]) {
-//            fontStyleName = boldStr;
-//            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
-//            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
-//            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
-//        }
+        //            if([fontStyleName hasSuffix: regularStr]) {
+        //            fontStyleName = regularStr;
+        //            /// 默认就是system，不用再次设置
+        //            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
+        //            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+        //            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
+        //        } else  if([fontStyleName hasSuffix: mediumStr]) {
+        //            fontStyleName = mediumStr;
+        //        } else if([fontStyleName hasSuffix: boldStr]) {
+        //            fontStyleName = boldStr;
+        //            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+        //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+        //            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
+        //        }
     }
 }
 @end
