@@ -106,7 +106,7 @@
 //        if (![vc.name isEqualToString: @"客户详情"]) {
 //
 //        continue;
-//        
+//
 //        }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
@@ -244,7 +244,7 @@
                         
                         /// 再找一找父控件里，又包含自己的真正父控件
                         NSArray<NSXMLElement *> *superViewInRootViewSubElements =
-                        [self getSubViewElementInElement: superViewInRootViewElement];
+                        [self getSubViewElementsInElement: superViewInRootViewElement];
 //
                         NSMutableArray<SKRect *> *superViewInRootViewSubSKRects = [NSMutableArray array];
                         for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
@@ -316,10 +316,12 @@
 }
 /// 生成某个页面中根view中的按钮
 - (void)generateBtnInRootViewFromVC:(NSXMLElement *) vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
+    
     NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
+    
     [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
+        // 根view下可组合成按钮的
+        NSArray<NSXMLElement *> *subEs = [self getSubViewElementsInElement: rootViewSubE];
         NSArray<NSString *> *names = [subEs valueForKeyPath:@"name"];
         BOOL isOnleText = names.count == 1 && [names containsObject: @"label"];
         BOOL isTextAndImg = subEs.count == 2 && [names containsObject: @"label"] &&
@@ -360,6 +362,58 @@
             [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
             [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
         }
+        
+        [subEs enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubSubE, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSArray<NSXMLElement *> *subEs2 = [self getSubViewElementsInElement: rootViewSubSubE];
+            NSArray<NSString *> *names2 = [subEs2 valueForKeyPath:@"name"];
+            BOOL isOnleText = names2.count == 1 && [names2 containsObject: @"label"];
+            BOOL isTextAndImg = subEs2.count == 2 && [names2 containsObject: @"label"] &&
+            [names containsObject: @"imageView"];
+            if ([rootViewSubSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
+                
+                NSXMLElement *label;
+                if (isOnleText) {
+                    label = subEs2[0];
+                    
+                } else if (isTextAndImg) {
+                    
+                    label = subEs2[[names indexOfObject: @"label"]];
+                }
+                // view 包含一个  label
+                NSXMLElement *button = [self getNewButtonElement];
+                // 更新button frame
+                [self setRect: [self getSKRectFromElement:rootViewSubSubE] forElement:button];
+                // 更新 bgColor
+                button.backgroundColor = rootViewSubSubE.backgroundColor;
+                // normal 状态下的文字
+                [self setNormalText: label.text forButtonElement:button];
+                // normal 状态下的字色 字号大小
+                button.fontSize = label.fontSize;
+                button.fontStyle = label.fontStyle;
+                button.normalTitleColor = label.textColor;
+                // 删除label
+                if (subEs2.count == 1) {
+                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                } else if (subEs2.count == 2) {
+                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                }
+                
+                // 删除 label的父控件view
+                NSUInteger idx = [subEs indexOfObject:rootViewSubSubE];
+                
+                [[self getSubViewElementInElement: rootViewSubE] removeChildAtIndex: idx];
+                // 更新button frame  这里坐标系 转换，有点头晕，后续有问题再修改
+                SKRect *firstSuperSKRect = [self getSKRectFromElement:rootViewSubE];
+                /// 坐标系转换
+                SKRect *oldSelfR = [self getSKRectFromElement: button];
+                oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
+                oldSelfR.y = [NSString stringWithFormat:@"%zd", ( firstSuperSKRect.y.integerValue-oldSelfR.y.integerValue)];
+                [self setRect:  oldSelfR forElement:button];
+
+                [self moveSubviewElement:button toSuperViewElement: rootViewSubE];
+            }
+        }];
     }];
 }
 /// 输出storyboard
@@ -440,13 +494,21 @@
     NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
     return subViewSuperView;
 }
-- (NSArray<NSXMLElement *> *)getSubViewElementInElement:(NSXMLElement *)viewElement {
+- (NSArray<NSXMLElement *> *)getSubViewElementsInElement:(NSXMLElement *)viewElement {
     if (!viewElement) {
         NSLog(@"未找到 %@", viewElement);
         return @[];
     }
     NSXMLElement *subViewSuperView = [viewElement firstElementByName:@"subviews"];
     return subViewSuperView.children;
+}
+- (NSXMLElement *)getSubViewElementInElement:(NSXMLElement *)viewElement {
+    if (!viewElement) {
+        NSLog(@"未找到 %@", viewElement);
+        return nil;
+    }
+    NSXMLElement *subViewSuperView = [viewElement firstElementByName:@"subviews"];
+    return subViewSuperView;
 }
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
