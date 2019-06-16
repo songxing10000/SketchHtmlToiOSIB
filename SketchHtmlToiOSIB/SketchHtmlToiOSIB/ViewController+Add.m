@@ -322,6 +322,10 @@
                     button.fontSize = label.fontSize;
                     button.fontStyle = label.fontStyle;
                     button.normalTitleColor = label.textColor;
+                    // 删除label
+                    [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                    // 删除 label的父控件view
+                    
                     [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
                 }
             }

@@ -231,8 +231,7 @@
 }
 -(NSString *)fontStyle {
     NSXMLElement *fontDescription = [self firstElementByName:@"fontDescription"];
-
-    return [[fontDescription firstElementByName: @"name"] stringValue];
+    return [fontDescription m_getValueForKey:@"name"];
 }
 -(void)setFontStyle:(NSString *)fontStyle {
     
