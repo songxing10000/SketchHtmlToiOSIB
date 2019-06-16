@@ -214,7 +214,7 @@
                 [self setLable:vc.name forVCElement:vcElement];
             }
             if (aNewWillBeAddedViewElement) {
-                NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement];
+                NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
                 NSMutableArray<SKRect *> *rootViewSubViewSKRects = [NSMutableArray array];
                 for (NSXMLElement *rootViewSubViewElement in rootViewSubViewElements) {
                     [rootViewSubViewSKRects addObject: [self getSKRectFromElement:rootViewSubViewElement]];
@@ -303,7 +303,7 @@
             }
         }
         // 尝试加入按钮
-        NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement];
+        NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
         [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
             NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
             if (subEs.count == 1) {
@@ -325,7 +325,9 @@
                     // 删除label
                     [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
                     // 删除 label的父控件view
-                    
+                    NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
+                    NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
+                    [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
                     [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
                 }
             }
@@ -402,7 +404,7 @@
     [subViewSuperView addChild:subViewElement];
     
 }
-- (NSArray<NSXMLElement *> *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
+- (NSArray<NSXMLElement *> *)getSubViewElementsInVCElement:(NSXMLElement *)vcElement {
     if (!vcElement) {
         NSLog(@"未找到 %@", vcElement);
         return @[];
@@ -412,6 +414,17 @@
     NSXMLElement *view = [vc firstElementByName:@"view"];
     NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
     return subViewSuperView.children;
+}
+- (NSXMLElement *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
+    if (!vcElement) {
+        NSLog(@"未找到 %@", vcElement);
+        return nil;
+    }
+    NSXMLElement *object = [vcElement firstElementByName:@"objects"];
+    NSXMLElement *vc = [object firstElementByName:@"viewController" ];
+    NSXMLElement *view = [vc firstElementByName:@"view"];
+    NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
+    return subViewSuperView;
 }
 - (NSArray<NSXMLElement *> *)getSubViewElementInElement:(NSXMLElement *)viewElement {
     if (!viewElement) {
