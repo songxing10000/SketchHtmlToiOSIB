@@ -11,7 +11,7 @@
 		041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0B21CF588F00F7A999 /* XMFileItem.m */; };
 		980BF50421CF03670035FF08 /* label.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF4FF21CF03670035FF08 /* label.xml */; };
 		980BF50521CF03670035FF08 /* sb.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50021CF03670035FF08 /* sb.xml */; };
-		980BF50621CF03670035FF08 /* imgV.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50121CF03670035FF08 /* imgV.xml */; };
+		980BF50621CF03670035FF08 /* imageView.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50121CF03670035FF08 /* imageView.xml */; };
 		980BF50721CF03670035FF08 /* view.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50221CF03670035FF08 /* view.xml */; };
 		980BF50821CF03670035FF08 /* vc.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50321CF03670035FF08 /* vc.xml */; };
 		9815BDC321CD47E10048AD13 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9815BDC221CD47E10048AD13 /* AppDelegate.m */; };
@@ -34,7 +34,7 @@
 		19FF10D1413BFF328D13470B /* libPods-SketchHtmlToiOSIB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SketchHtmlToiOSIB.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		980BF4FF21CF03670035FF08 /* label.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = label.xml; sourceTree = "<group>"; };
 		980BF50021CF03670035FF08 /* sb.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sb.xml; sourceTree = "<group>"; };
-		980BF50121CF03670035FF08 /* imgV.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = imgV.xml; sourceTree = "<group>"; };
+		980BF50121CF03670035FF08 /* imageView.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = imageView.xml; sourceTree = "<group>"; };
 		980BF50221CF03670035FF08 /* view.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = view.xml; sourceTree = "<group>"; };
 		980BF50321CF03670035FF08 /* vc.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = vc.xml; sourceTree = "<group>"; };
 		9815BDBE21CD47E10048AD13 /* SketchHtmlToiOSIB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SketchHtmlToiOSIB.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,7 +96,7 @@
 			children = (
 				980BF4FF21CF03670035FF08 /* label.xml */,
 				980BF50021CF03670035FF08 /* sb.xml */,
-				980BF50121CF03670035FF08 /* imgV.xml */,
+				980BF50121CF03670035FF08 /* imageView.xml */,
 				980BF50221CF03670035FF08 /* view.xml */,
 				980BF50321CF03670035FF08 /* vc.xml */,
 			);
@@ -237,7 +237,7 @@
 				980BF50721CF03670035FF08 /* view.xml in Resources */,
 				980BF50821CF03670035FF08 /* vc.xml in Resources */,
 				9815BDC821CD47E20048AD13 /* Assets.xcassets in Resources */,
-				980BF50621CF03670035FF08 /* imgV.xml in Resources */,
+				980BF50621CF03670035FF08 /* imageView.xml in Resources */,
 				9815BDCB21CD47E20048AD13 /* Main.storyboard in Resources */,
 				980BF50521CF03670035FF08 /* sb.xml in Resources */,
 			);

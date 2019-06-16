@@ -304,6 +304,7 @@
                 }
             }
         }
+        // 尝试加入按钮
         [scenes addChild: vcElement];
         self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
@@ -469,7 +470,7 @@
 }
 /// name imageView"
 - (NSXMLElement *)getNewImageViewElement {
-    NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imgV"];
+    NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imageView"];
     [self setRandomIdForElement:imgVElement];
     return imgVElement.copy;
 }
