@@ -56,6 +56,12 @@ vc功能列表
 - [ ] 大控件遮住了小控件，调整控件层级功能
 - [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
+button功能列表
+- [x] 背景颜色
+- [x] 字样式及大小
+- [x] normal状态下的文字及文字颜色
+***
+***
 label功能列表
 - [x] text
 - [x] textColor
@@ -71,7 +77,14 @@ view功能列表
 - [x] rect
 - [x] bgColor
 - [x] bg alpha
-- [x] 目前仅支持一次嵌套(即只能往根view的子view里加入子控件)
+- [x] 根view的直接子view, 加入子控件
+
+![](contain1.png)
+
+- [x] 根view的直接子view的子view，加入子控件
+
+![](contain2.png)
+
 ***
 imageView功能列表
 
