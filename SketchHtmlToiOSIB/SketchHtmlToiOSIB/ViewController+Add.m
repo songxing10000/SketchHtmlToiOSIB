@@ -303,35 +303,7 @@
             }
         }
         // 尝试加入按钮
-        NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
-        [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
-            if (subEs.count == 1) {
-                if ([rootViewSubE.name isEqualToString: @"view"] &&
-                    [subEs[0].name isEqualToString: @"label"]) {
-                    NSXMLElement *label = subEs[0];
-                    // view 包含一个  label
-                    NSXMLElement *button = [self getNewButtonElement];
-                    // 更新button frame
-                    [self setRect: [self getSKRectFromElement:rootViewSubE] forElement:button];
-                   // 更新 bgColor
-                    button.backgroundColor = rootViewSubE.backgroundColor;
-                    // normal 状态下的文字
-                    [self setNormalText: label.text forButtonElement:button];
-                    // normal 状态下的字色 字号大小
-                    button.fontSize = label.fontSize;
-                    button.fontStyle = label.fontStyle;
-                    button.normalTitleColor = label.textColor;
-                    // 删除label
-                    [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                    // 删除 label的父控件view
-                    NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
-                    NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
-                    [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
-                    [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
-                }
-            }
-        }];
+        [self generateBtnInRootViewFromVC:vcElement fromSbDocument:sbDocument];
         [scenes addChild: vcElement];
         self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
@@ -347,6 +319,38 @@
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
     [self.hud hide:YES];
     
+}
+/// 生成某个页面中根view中的按钮
+- (void)generateBtnInRootViewFromVC:(NSXMLElement *) vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
+    NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
+    [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
+        if (subEs.count == 1) {
+            if ([rootViewSubE.name isEqualToString: @"view"] &&
+                [subEs[0].name isEqualToString: @"label"]) {
+                NSXMLElement *label = subEs[0];
+                // view 包含一个  label
+                NSXMLElement *button = [self getNewButtonElement];
+                // 更新button frame
+                [self setRect: [self getSKRectFromElement:rootViewSubE] forElement:button];
+                // 更新 bgColor
+                button.backgroundColor = rootViewSubE.backgroundColor;
+                // normal 状态下的文字
+                [self setNormalText: label.text forButtonElement:button];
+                // normal 状态下的字色 字号大小
+                button.fontSize = label.fontSize;
+                button.fontStyle = label.fontStyle;
+                button.normalTitleColor = label.textColor;
+                // 删除label
+                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                // 删除 label的父控件view
+                NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
+                NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
+                [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
+                [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
+            }
+        }
+    }];
 }
 /// 输出storyboard
 - (BOOL)saveXMLDoucment:(NSXMLDocument *)XMLDoucment toPath:(NSString *)destPath {
