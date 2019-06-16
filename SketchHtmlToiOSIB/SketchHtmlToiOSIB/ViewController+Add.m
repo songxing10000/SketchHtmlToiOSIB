@@ -166,9 +166,9 @@
                 if ([view.content isEqualToString: @"跟进"]) {
                     NSLog(@"---%@---",@"fd");
                 }
-                [self setText:view.content forLableElement:labelElement];
-                //                [self setText:view.textAlign ForElement:labelElement];
-                labelElement.pointSize = view.fontSize;
+                labelElement.text = view.content;
+                // [self setText:view.textAlign ForElement:labelElement];
+                labelElement.fontSize = view.fontSize;
                 /// 这里用 r g b a除 255 更精准
                 /// 之前用 view.color.uiColor (r:0.77 g:0.77 b:0.77 a:1.00)
                 /// 丢失了精准
@@ -179,8 +179,7 @@
                     //可能是标题
                     vcTitle = view.content;
                 }
-                /// 字的正常、中等、粗
-                [self setTextRegularMediumBold:view.fontFace forLabelElement:labelElement];
+                labelElement.fontStyle = view.fontFace;
                 aNewWillBeAddedViewElement = labelElement;
             }else if ([viewType isEqualToString:@"slice"]) {//图片
 #pragma mark - UIImageView
@@ -310,6 +309,7 @@
             if (subEs.count == 1) {
                 if ([rootViewSubE.name isEqualToString: @"view"] &&
                     [subEs[0].name isEqualToString: @"label"]) {
+                    NSXMLElement *label = subEs[0];
                     // view 包含一个  label
                     NSXMLElement *button = [self getNewButtonElement];
                     // 更新button frame
@@ -317,10 +317,12 @@
                    // 更新 bgColor
                     button.backgroundColor = rootViewSubE.backgroundColor;
                     // normal 状态下的文字
-                    NSString *titleLabelText = [self getTextFromLableElement:subEs[0]];
-                    [self setNormalText:titleLabelText forButtonElement:button];
+                    [self setNormalText: label.text forButtonElement:button];
                     // normal 状态下的字色 字号大小
-                    
+                    button.fontSize = label.fontSize;
+                    button.fontStyle = label.fontStyle;
+                    button.normalTitleColor = label.textColor;
+                    [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
                 }
             }
         }];
@@ -564,10 +566,6 @@
         }
     }
 }
--(NSString *)getTextFromLableElement:(NSXMLElement *)element{
-    NSString *key = @"text";
-    return [self getValueForKey: key forElement: element];
-}
 -(void)setNormalText:(NSString *)text forButtonElement:(NSXMLElement *)element {
     if (![element.name isEqualToString: @"button"]) {
         return;
@@ -589,10 +587,7 @@
         }
     }
 }
--(void)setText:(NSString *)text forLableElement:(NSXMLElement *)element{
-    NSString *key = @"text";
-    [self setValue: text forKey: key forElement: element];
-}
+
 -(void)setAlpha:(NSString *)alpha ForElement:(NSXMLElement *)element{
     if ([alpha isEqualToString:@"1"]) {
         return;
@@ -631,17 +626,7 @@
     NSString *key = @"userLabel";
     [self setValue:text forKey:key forElement:viewController];
 }
-- (NSString *)getValueForKey:(NSString *)key  forElement:(NSXMLElement *)element {
-    if (!key || !element) {
-        return @"";
-    }
-    BOOL hasKey = [element attributeForName: key].name.length;
-    if (hasKey) {
-        NSString *valueStr = [element attributeForName: key].stringValue;
-        return valueStr;
-    }
-    return @"";
-}
+
 - (void)setValue:(NSString *)value forKey:(NSString *)key  forElement:(NSXMLElement *)element {
     if (!key || !value || !element) {
         return;
@@ -698,63 +683,5 @@
     }
     return dic;
 }
-- (void)setTextRegularMediumBold:(NSString *)style forLabelElement:(NSXMLElement *)labelElement {
-    NSString *fontStyleName = style;
-    if (fontStyleName && fontStyleName.length > 0) {
-        /*
-         label xml 中没有添加  type="system" ，如果添加以下两种字体会涉及删除 type="system" 这个东西，所以如果是系统的就加上这个key更容易处理，目前UI给的全是苹方字体
-         苹方-简 常规体  PingFangSC-Regular
-         <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="17"/>
-         苹方-简 中黑体  PingFangSC-Medium
-         <fontDescription key="fontDescription" name="PingFangSC-Medium" family="PingFang SC" pointSize="17"/>
-         苹方-简 中粗体
-         <fontDescription key="fontDescription" name="PingFangSC-Semibold" family="PingFang SC" pointSize="17"/>
-         */
-        if([fontStyleName isEqualToString: @"PingFangSC-Regular"]) {
-            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-            [self setValue:@"PingFangSC-Regular" forKey:@"name" forElement:fontDescription];
-            [self setValue:@"PingFang SC" forKey:@"family" forElement:fontDescription];
-            
-        } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"]) {
-            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-            [self setValue:@"PingFangSC-Medium" forKey: @"name" forElement:fontDescription];
-            [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
-            
-        } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
-            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-            [self setValue:@"PingFangSC-Semibold" forKey: @"name" forElement:fontDescription];
-            [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
-        } else if([fontStyleName isEqualToString: @"DINAlternate-Bold"]) {
-            /*
-             <fontDescription key="fontDescription" name="DINAlternate-Bold" family="DIN Alternate" pointSize="16"/>
-             */
-            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-            [self setValue:@"DINAlternate-Bold" forKey: @"name" forElement:fontDescription];
-            [self setValue:@"DIN Alternate" forKey: @"family" forElement:fontDescription];
-        } else if([fontStyleName isEqualToString: @"Helvetica"]) {
-            /*
-             <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="16"/>
-             */
-            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-            [self setValue:@"Helvetica" forKey: @"name" forElement:fontDescription];
-            [self setValue:@"Helvetica" forKey: @"family" forElement:fontDescription];
-        } else {
-            NSLog(@"找不到字体：%@", fontStyleName);
-        }
-        //            if([fontStyleName hasSuffix: regularStr]) {
-        //            fontStyleName = regularStr;
-        //            /// 默认就是system，不用再次设置
-        //            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
-        //            //            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-        //            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
-        //        } else  if([fontStyleName hasSuffix: mediumStr]) {
-        //            fontStyleName = mediumStr;
-        //        } else if([fontStyleName hasSuffix: boldStr]) {
-        //            fontStyleName = boldStr;
-        //            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
-        //            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
-        //            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
-        //        }
-    }
-}
+
 @end
