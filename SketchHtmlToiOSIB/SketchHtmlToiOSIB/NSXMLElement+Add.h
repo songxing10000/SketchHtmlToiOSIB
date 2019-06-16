@@ -24,6 +24,8 @@
 /// label button 字的样式类型如 苹方-简 常规体
 @property(nonatomic, copy) NSString *fontStyle;
 
-- (NSXMLElement *)firstElementByName:(NSString *)elementName; 
+- (NSXMLElement *)firstElementByName:(NSString *)elementName;
+- (NSString *)m_getValueForKey:(NSString *)key;
+- (void)m_setValue:(NSString *)value forKey:(NSString *)key;
 @end
 

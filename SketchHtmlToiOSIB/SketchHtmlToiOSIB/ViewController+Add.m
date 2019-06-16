@@ -7,7 +7,7 @@
 //
 
 #import "ViewController+Add.h"
-#import "NSXMLElement+Add.m"
+#import "NSXMLElement+Add.h"
 @implementation ViewController (Add)
 #pragma mark - read save xml
 
@@ -102,6 +102,10 @@
     [sbDocument.rootElement firstElementByName:@"scenes"];
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
+        /// 调试某个特定页面可这样写
+//        if (![vc.name isEqualToString: @"客户详情"]) {
+//            continue;
+//        }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         /// 设计稿 375*667
@@ -246,42 +250,34 @@
                         }
                         /// 在父控件里又有父控件
                         BOOL hasSuperViewInSuperView = NO;
+                        if ([[aNewWillBeAddedViewElement m_getValueForKey: @"text"] isEqualToString: @"跟进"]) {
+                            
+                            NSLog(@"---%@---",@"fdf");
+                        }
                         for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
 //
                             CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
-////
-                            if ( CGRectContainsRect(superViewInSuperViewCGRect, aNewWillBeAddedViewRect) ) {
+                            /// 最开始要加的父控件的SKRect
+                            SKRect *firstSuperSKRect = [self getSKRectFromElement:superViewInRootViewElement];
+                            /// 坐标系转换
+                            SKRect *oldSelfR = [self getSKRectFromElement:aNewWillBeAddedViewElement];
+                            oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
+                            oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - firstSuperSKRect.y.integerValue)];
+                            
+                            
+                            if ( CGRectContainsRect(superViewInSuperViewCGRect, [self getCGRectFromSKRect:oldSelfR]) ) {
                                 hasSuperViewInSuperView = YES;
 //
                                 NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSubSKRects indexOfObject:superViewInRootViewSubSKRect];
                                 NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
+                                [self setRect:oldSelfR forElement:aNewWillBeAddedViewElement];
                                 [self moveSubviewElement: aNewWillBeAddedViewElement
                                       toSuperViewElement: findedSuperViewInSuperViewElement];
                                 break;
-                            } else  {
-                                SKRect *oldSelfR = [self getSKRectFromElement:aNewWillBeAddedViewElement];
-                                oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - superViewInRootViewSubSKRect.x.integerValue)];
-                                oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - superViewInRootViewSubSKRect.y.integerValue)];
-                                
-                                /// 放入的新控件，可以当做现在某个子控件的父控件
-                                if ( CGRectContainsRect(aNewWillBeAddedViewRect, [self getCGRectFromSKRect:oldSelfR]) ) {
-                                    // 把之前的控件，移动到新控件内
-//                                    NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSubSKRects indexOfObject:superViewInRootViewSubSKRect];
-//                                    NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
-//                                    [superViewInRootViewElement removeChildAtIndex:findedSuperViewInSuperViewIdx];
-                                    // todo 将之前的移动到新的上
-//                                    NSXMLElement *aNew = findedSuperViewInSuperViewElement.copy;
-//                                    [self setRandomIdForElement:aNew];
-//                                    [self moveSubviewElement: aNew
-//                                          toSuperViewElement: aNewWillBeAddedViewElement];
-                                    break;
-                                }
                             }
 //
                         }
                         if (!hasSuperViewInSuperView) {
-//                            //  在根view下面没有找到了父控件，就加入到根view下
-                            
                             [self moveSubviewElement: aNewWillBeAddedViewElement
                                   toSuperViewElement: superViewInRootViewElement];
                         } else {
