@@ -1,0 +1,10 @@
+<button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hHm-NJ-sD5">
+    <rect key="frame" x="159" y="122" width="102" height="36"/>
+    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+    <color key="backgroundColor" red="0.9882352941176471" green="0.85098039215686272" blue="0.25882352941176467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+    <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="17"/>
+    <state key="normal" title="进行个人认证">
+        <color key="titleColor" red="0.602876575629404" green="0.40777175996932513" blue="0.31287945139627515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+    </state>
+</button>
+

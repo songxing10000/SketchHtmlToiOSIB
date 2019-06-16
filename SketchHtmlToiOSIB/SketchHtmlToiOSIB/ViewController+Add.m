@@ -7,6 +7,7 @@
 //
 
 #import "ViewController+Add.h"
+#import "NSXMLElement+Add.m"
 @implementation ViewController (Add)
 #pragma mark - read save xml
 
@@ -98,7 +99,7 @@
     NSXMLDocument *sbDocument = [self documentWithXmlFileName:@"sb"];
     
     NSXMLElement *scenes =
-    [self getFirstElementByName:@"scenes" FromElement:sbDocument.rootElement];
+    [sbDocument.rootElement firstElementByName:@"scenes"];
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         NSXMLElement *vcElement = [self getNewVCElement];
@@ -117,8 +118,8 @@
         if (screenH < max) {
             // 这里可以先添加一个scrollView在根view上，再添加其他子控件
             
-            NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
-            NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
+            NSXMLElement *object = [vcElement firstElementByName:@"objects"];
+            NSXMLElement *vc = [object firstElementByName:@"viewController"];
             NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[vc elementsForName:@"size"];
             NSXMLElement *size;
             NSString *maxStr = @(max+20).stringValue;
@@ -167,13 +168,12 @@
                 }
                 [self setText:view.content forLableElement:labelElement];
                 //                [self setText:view.textAlign ForElement:labelElement];
-                [self setPointSize:view.fontSize forLabelElement:labelElement];
+                labelElement.pointSize = view.fontSize;
                 /// 这里用 r g b a除 255 更精准
                 /// 之前用 view.color.uiColor (r:0.77 g:0.77 b:0.77 a:1.00)
                 /// 丢失了精准
                 NSString *newColor = [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
-                [self setTextColor: newColor//view.color.uiColor
-                   forLabelElement:labelElement];
+                labelElement.textColor = newColor;
                 if ([view.rect.y isEqualToString: @"30"]||
                     [view.rect.y isEqualToString: @"31"]) {
                     //可能是标题
@@ -196,8 +196,7 @@
                 NSXMLElement *viewElement = [self getNewViewElement];
                 [self setRect:view.rect forElement:viewElement];
                 if (view.fills && view.fills.count > 0) {
-                    
-                    [self setBgColor:view.fills[0].color.uiColor forViewElement:viewElement];
+                    viewElement.backgroundColor = view.fills[0].color.uiColor ;
                 }
                 if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
@@ -305,6 +304,26 @@
             }
         }
         // 尝试加入按钮
+        NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement];
+        [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
+            if (subEs.count == 1) {
+                if ([rootViewSubE.name isEqualToString: @"view"] &&
+                    [subEs[0].name isEqualToString: @"label"]) {
+                    // view 包含一个  label
+                    NSXMLElement *button = [self getNewButtonElement];
+                    // 更新button frame
+                    [self setRect: [self getSKRectFromElement:rootViewSubE] forElement:button];
+                   // 更新 bgColor
+                    button.backgroundColor = rootViewSubE.backgroundColor;
+                    // normal 状态下的文字
+                    NSString *titleLabelText = [self getTextFromLableElement:subEs[0]];
+                    [self setNormalText:titleLabelText forButtonElement:button];
+                    // normal 状态下的字色 字号大小
+                    
+                }
+            }
+        }];
         [scenes addChild: vcElement];
         self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
@@ -357,7 +376,7 @@
         NSLog(@"未找到 %@", superViewElement);
         return;
     }
-    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement: superViewElement];
+    NSXMLElement *subViewSuperView = [superViewElement firstElementByName:@"subviews"];
     if ([superViewElement.name isEqualToString:@"label"] ||
         [superViewElement.name isEqualToString:@"imageView"] ||
         [superViewElement.name isEqualToString:@"button"]) {
@@ -382,10 +401,10 @@
         NSLog(@"未找到 %@", vcElement);
         return @[];
     }
-    NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
-    NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
-    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
-    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
+    NSXMLElement *object = [vcElement firstElementByName:@"objects"];
+    NSXMLElement *vc = [object firstElementByName:@"viewController" ];
+    NSXMLElement *view = [vc firstElementByName:@"view"];
+    NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
     return subViewSuperView.children;
 }
 - (NSArray<NSXMLElement *> *)getSubViewElementInElement:(NSXMLElement *)viewElement {
@@ -393,7 +412,7 @@
         NSLog(@"未找到 %@", viewElement);
         return @[];
     }
-    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement: viewElement];
+    NSXMLElement *subViewSuperView = [viewElement firstElementByName:@"subviews"];
     return subViewSuperView.children;
 }
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
@@ -405,10 +424,10 @@
         NSLog(@"未找到 %@", vcElement);
         return;
     }
-    NSXMLElement *object = [self getFirstElementByName:@"objects" FromElement:vcElement];
-    NSXMLElement *vc = [self getFirstElementByName:@"viewController" FromElement:object];
-    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:vc];
-    NSXMLElement *subViewSuperView = [self getFirstElementByName:@"subviews" FromElement:view];
+    NSXMLElement *object = [vcElement firstElementByName:@"objects" ];
+    NSXMLElement *vc = [object firstElementByName:@"viewController" ];
+    NSXMLElement *view = [vc firstElementByName:@"view"];
+    NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
     /// 限制加入子控件的个数
     //    if (subViewSuperView.childCount > 80) {
     if ([subViewElement.name isEqualToString:@"label"]) {
@@ -440,7 +459,7 @@
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"width" stringValue:@"16"]];
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
             NSXMLElement *resources =
-            [self getFirstElementByName:@"resources" FromElement:sbDocument.rootElement];
+            [sbDocument.rootElement firstElementByName:@"resources"];
             [resources addChild:imageNode.copy];
         }
     }
@@ -448,23 +467,28 @@
 - (NSXMLElement *)getNewVCElement {
     NSXMLElement *vcElement = [self rootElementWithXmlFileName:@"vc"];
     [self setRandomIdForElement:vcElement];
-    NSXMLElement *objects = [self getFirstElementByName:@"objects" FromElement:vcElement];
-    NSXMLElement *placeholder = [self getFirstElementByName:@"placeholder" FromElement:objects];
+    NSXMLElement *objects = [vcElement firstElementByName:@"objects"];
+    NSXMLElement *placeholder = [objects firstElementByName:@"placeholder"];
     [self setRandomIdForElement:placeholder];
     
-    NSXMLElement *viewController = [self getFirstElementByName:@"viewController" FromElement:objects];
+    NSXMLElement *viewController = [objects firstElementByName:@"viewController"];
     [self setRandomIdForElement:viewController];
     
     
-    NSXMLElement *view = [self getFirstElementByName:@"view" FromElement:viewController];
+    NSXMLElement *view = [viewController firstElementByName:@"view" ];
     [self setRandomIdForElement:view];
-    NSXMLElement *viewLayoutGuide = [self getFirstElementByName:@"viewLayoutGuide" FromElement:view];
+    NSXMLElement *viewLayoutGuide = [view firstElementByName:@"viewLayoutGuide" ];
     [self setRandomIdForElement:viewLayoutGuide];
     
     return vcElement.copy;
 }
 - (NSXMLElement *)getNewlabelElement {
     NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"label"];
+    [self setRandomIdForElement:lableElement];
+    return lableElement.copy;
+}
+- (NSXMLElement *)getNewButtonElement {
+    NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"button"];
     [self setRandomIdForElement:lableElement];
     return lableElement.copy;
 }
@@ -489,29 +513,11 @@
     }
 }
 
-
-
-
-- (NSXMLElement *)getFirstElementByName:(NSString *)elementName FromElement:(NSXMLElement *)element {
-    NSArray<NSXMLElement *> *elements = [element elementsForName:elementName];
-    if (elements.count >= 1) {
-        return elements[0];
-    }
-    /*
-     
-     
-     */
-    NSLog(@"未找到 %@，创建空的", elementName);
-    NSXMLElement *add = [NSXMLElement elementWithName:elementName];
-    [element addChild:add.copy];
-    return add ;
-}
-
 /// 获取某个元素的 frame
 - (SKRect *)getSKRectFromElement:(NSXMLElement *)element{
     
     SKRect *skr = [SKRect new];
-    NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
+    NSXMLElement *rectElement = [element firstElementByName:@"rect"];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
@@ -539,7 +545,7 @@
 }
 /// 设置某个元素的 frame
 - (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element{
-    NSXMLElement *rectElement = [self getFirstElementByName:@"rect" FromElement:(NSXMLElement *)element];
+    NSXMLElement *rectElement = [element firstElementByName:@"rect"];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
@@ -555,6 +561,31 @@
             }
         } else if ([node.name isEqualToString: @"height"]) {
             [node setStringValue: rect.height];
+        }
+    }
+}
+-(NSString *)getTextFromLableElement:(NSXMLElement *)element{
+    NSString *key = @"text";
+    return [self getValueForKey: key forElement: element];
+}
+-(void)setNormalText:(NSString *)text forButtonElement:(NSXMLElement *)element {
+    if (![element.name isEqualToString: @"button"]) {
+        return;
+    }
+    /*
+     <button>
+     <state key="normal" title="Button"/>
+     <state key="selected" title="4343434"/>
+     </button>
+     */
+    NSXMLElement *stateTextElement = [element firstElementByName:@"state"];
+    NSArray<NSXMLNode *> *nodes = stateTextElement.attributes;
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: @"key"]) {
+            // 状态
+        } else if ([node.name isEqualToString: @"title"]) {
+            // 文字内容
+            [node setStringValue: text];
         }
     }
 }
@@ -576,74 +607,7 @@
     __unused NSString *key = @"textAlignment";
     //    [self setValue:textAlign forKey:key forElement:element];
 }
-- (void)setPointSize:(NSString *)pointSize forLabelElement:(NSXMLElement *)element{
-    NSString *input = pointSize;
-    BOOL hasValue = input && input.length > 0;
-    if (!hasValue) {
-        return;
-    }
-    NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:(NSXMLElement *)element];
-    NSString *key = @"pointSize";
-    [self setValue:pointSize forKey:key forElement:fontDescription];
-}
--(void)setColor:(NSString *)textColor type:(NSString *)type ForElement:(NSXMLElement *)element {
-    NSString *input = textColor;
-    BOOL hasValue = input && input.length > 0;
-    if (!hasValue) {
-        return;
-    }
-    NSArray<NSXMLElement *> *elements = (NSArray<NSXMLElement *> *)[element elementsForName:@"color"];
-    NSXMLElement *desElement;
-    for (NSXMLElement *colorE in elements) {
-        NSArray<NSXMLNode *> *nodes = colorE.attributes;
-        for (NSXMLNode * node in nodes) {
-            if ([node.name isEqualToString:@"key"]) {
-                if ([[node stringValue] isEqualToString:@"textColor"] &&
-                    [type isEqualToString:@"textColor"]) {
-                    desElement = colorE;
-                    break;
-                } else if ([[node stringValue] isEqualToString:@"backgroundColor"] &&
-                           [type isEqualToString:@"backgroundColor"]) {
-                    desElement = colorE;
-                    break;
-                }
-            }
-        }
-    }
-    if (!desElement) {
-        return;
-    }
-    NSXMLElement *rectElement = desElement;
-    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
-    NSString *color = [textColor stringByReplacingOccurrencesOfString:@"(r:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@".00)" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"r:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"g:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"b:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"a:" withString:@""];
-    NSArray<NSString *> *rgba = [color componentsSeparatedByString:@" "];
-    
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"red"]) {
-            [node setStringValue: rgba[0]];
-        }else if ([node.name isEqualToString: @"green"]) {
-            [node setStringValue: rgba[1]];
-        } else if ([node.name isEqualToString: @"blue"]) {
-            [node setStringValue: rgba[2]];
-        } else if ([node.name isEqualToString: @"realphad"]) {
-            [node setStringValue: rgba[3]];
-        }
-        
-    }
-}
--(void)setTextColor:(NSString *)textColor forLabelElement:(NSXMLElement *)element {
-    [self setColor:textColor type:@"textColor" ForElement:element];
-}
 
--(void)setBgColor:(NSString *)viewBgColor forViewElement:(NSXMLElement *)element {
-    [self setColor:viewBgColor type:@"backgroundColor" ForElement:element];
-    
-}
 -(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element {
 #pragma mark - to do
     // ["border: 1px solid #295DFD;","border-radius: 4px;"]
@@ -661,11 +625,22 @@
     if (!hasValue) {
         return;
     }
-    NSXMLElement *objects =  [self getFirstElementByName:@"objects" FromElement:element];
-    NSXMLElement *viewController =  [self getFirstElementByName:@"viewController" FromElement:objects];
+    NSXMLElement *objects =  [element firstElementByName:@"objects" ];
+    NSXMLElement *viewController =  [objects firstElementByName:@"viewController" ];
     
     NSString *key = @"userLabel";
     [self setValue:text forKey:key forElement:viewController];
+}
+- (NSString *)getValueForKey:(NSString *)key  forElement:(NSXMLElement *)element {
+    if (!key || !element) {
+        return @"";
+    }
+    BOOL hasKey = [element attributeForName: key].name.length;
+    if (hasKey) {
+        NSString *valueStr = [element attributeForName: key].stringValue;
+        return valueStr;
+    }
+    return @"";
 }
 - (void)setValue:(NSString *)value forKey:(NSString *)key  forElement:(NSXMLElement *)element {
     if (!key || !value || !element) {
@@ -736,31 +711,31 @@
          <fontDescription key="fontDescription" name="PingFangSC-Semibold" family="PingFang SC" pointSize="17"/>
          */
         if([fontStyleName isEqualToString: @"PingFangSC-Regular"]) {
-            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
             [self setValue:@"PingFangSC-Regular" forKey:@"name" forElement:fontDescription];
             [self setValue:@"PingFang SC" forKey:@"family" forElement:fontDescription];
             
         } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"]) {
-            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
             [self setValue:@"PingFangSC-Medium" forKey: @"name" forElement:fontDescription];
             [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
             
         } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
-            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
             [self setValue:@"PingFangSC-Semibold" forKey: @"name" forElement:fontDescription];
             [self setValue:@"PingFang SC" forKey: @"family" forElement:fontDescription];
         } else if([fontStyleName isEqualToString: @"DINAlternate-Bold"]) {
             /*
              <fontDescription key="fontDescription" name="DINAlternate-Bold" family="DIN Alternate" pointSize="16"/>
              */
-            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
             [self setValue:@"DINAlternate-Bold" forKey: @"name" forElement:fontDescription];
             [self setValue:@"DIN Alternate" forKey: @"family" forElement:fontDescription];
         } else if([fontStyleName isEqualToString: @"Helvetica"]) {
             /*
              <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="16"/>
              */
-            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
             [self setValue:@"Helvetica" forKey: @"name" forElement:fontDescription];
             [self setValue:@"Helvetica" forKey: @"family" forElement:fontDescription];
         } else {
@@ -770,14 +745,14 @@
         //            fontStyleName = regularStr;
         //            /// 默认就是system，不用再次设置
         //            // <fontDescription key="fontDescription" type="system" pointSize="13"/>
-        //            //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+        //            //            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
         //            //            [self setValue:@"system" forKey:@"type" forElement:fontDescription];
         //        } else  if([fontStyleName hasSuffix: mediumStr]) {
         //            fontStyleName = mediumStr;
         //        } else if([fontStyleName hasSuffix: boldStr]) {
         //            fontStyleName = boldStr;
         //            // <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
-        //            NSXMLElement *fontDescription = [self getFirstElementByName:@"fontDescription" FromElement:labelElement];
+        //            NSXMLElement *fontDescription = [labelElement firstElementByName:@"fontDescription"];
         //            [self setValue:@"boldSystem" forKey:@"type" forElement:fontDescription];
         //        }
     }

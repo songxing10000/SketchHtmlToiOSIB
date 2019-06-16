@@ -26,14 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSXMLElement *)getNewViewElement;
 - (void)setRandomIdForElement:(NSXMLElement *)element;
 #pragma mark - setProperty
-- (NSXMLElement *)getFirstElementByName:(NSString *)elementName FromElement:(NSXMLElement *)element;
 - (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element;
 -(void)setText:(NSString *)text forLableElement:(NSXMLElement *)element;
 -(void)setTextAlign:(NSString *)textAlign forLabelElement:(NSXMLElement *)element;
 - (void)setTextRegularMediumBold:(NSString *)style forLabelElement:(NSXMLElement *)labelElement; 
-- (void)setPointSize:(NSString *)pointSize forLabelElement:(NSXMLElement *)element;
--(void)setTextColor:(NSString *)textColor forLabelElement:(NSXMLElement *)element;
--(void)setBgColor:(NSString *)viewBgColor forViewElement:(NSXMLElement *)element;
 /// 背景alpha
 -(void)setAlpha:(NSString *)alpha ForElement:(NSXMLElement *)element;
 
