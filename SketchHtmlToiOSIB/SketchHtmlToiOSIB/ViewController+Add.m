@@ -104,7 +104,9 @@
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
 //        if (![vc.name isEqualToString: @"客户详情"]) {
-//            continue;
+//
+//        continue;
+//        
 //        }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
@@ -250,10 +252,6 @@
                         }
                         /// 在父控件里又有父控件
                         BOOL hasSuperViewInSuperView = NO;
-                        if ([[aNewWillBeAddedViewElement m_getValueForKey: @"text"] isEqualToString: @"跟进"]) {
-                            
-                            NSLog(@"---%@---",@"fdf");
-                        }
                         for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
 //
                             CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
@@ -320,31 +318,47 @@
 - (void)generateBtnInRootViewFromVC:(NSXMLElement *) vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
     [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
+        
         NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE];
-        if (subEs.count == 1) {
-            if ([rootViewSubE.name isEqualToString: @"view"] &&
-                [subEs[0].name isEqualToString: @"label"]) {
-                NSXMLElement *label = subEs[0];
-                // view 包含一个  label
-                NSXMLElement *button = [self getNewButtonElement];
-                // 更新button frame
-                [self setRect: [self getSKRectFromElement:rootViewSubE] forElement:button];
-                // 更新 bgColor
-                button.backgroundColor = rootViewSubE.backgroundColor;
-                // normal 状态下的文字
-                [self setNormalText: label.text forButtonElement:button];
-                // normal 状态下的字色 字号大小
-                button.fontSize = label.fontSize;
-                button.fontStyle = label.fontStyle;
-                button.normalTitleColor = label.textColor;
-                // 删除label
-                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                // 删除 label的父控件view
-                NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
-                NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
-                [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
-                [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
+        NSArray<NSString *> *names = [subEs valueForKeyPath:@"name"];
+        BOOL isOnleText = names.count == 1 && [names containsObject: @"label"];
+        BOOL isTextAndImg = subEs.count == 2 && [names containsObject: @"label"] &&
+        [names containsObject: @"imageView"];
+        if ([rootViewSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
+            
+            NSXMLElement *label;
+            if (isOnleText) {
+                label = subEs[0];
+                
+            } else if (isTextAndImg) {
+
+                label = subEs[[names indexOfObject: @"label"]];
             }
+            // view 包含一个  label
+            NSXMLElement *button = [self getNewButtonElement];
+            // 更新button frame
+            [self setRect: [self getSKRectFromElement:rootViewSubE] forElement:button];
+            // 更新 bgColor
+            button.backgroundColor = rootViewSubE.backgroundColor;
+            // normal 状态下的文字
+            [self setNormalText: label.text forButtonElement:button];
+            // normal 状态下的字色 字号大小
+            button.fontSize = label.fontSize;
+            button.fontStyle = label.fontStyle;
+            button.normalTitleColor = label.textColor;
+            // 删除label
+            if (subEs.count == 1) {
+                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+            } else if (subEs.count == 2) {
+                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
+            }
+            
+            // 删除 label的父控件view
+            NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementsInVCElement:vcElement];
+            NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
+            [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
+            [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
         }
     }];
 }
