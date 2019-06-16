@@ -9,6 +9,59 @@
 #import "NSXMLElement+Add.h"
 
 @implementation NSXMLElement (Add)
+-(CGRect)cgRect {
+    SKRect *skRect = self.skRect;
+    CGRect rect =
+    CGRectMake(skRect.x.floatValue, skRect.y.floatValue, skRect.width.floatValue, skRect.height.floatValue);
+    return rect;
+}
+-(void)setCgRect:(CGRect)cgRect {
+    
+}
+-(SKRect *)skRect {
+    SKRect *rect = [SKRect new];
+    NSXMLElement *rectElement = [self firstElementByName:@"rect"];
+    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: @"x"]) {
+            
+            rect.x = node.stringValue;
+        } else if ([node.name isEqualToString: @"y"]) {
+            rect.y  = node.stringValue;
+        } else if ([node.name isEqualToString: @"width"]) {
+            rect.width = node.stringValue;
+            if ([self.name isEqualToString:@"label"]) {
+                /// 修复lable宽度，自动布局时，宽度自适应
+                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+                rect.width =  fixW;
+            }
+        } else if ([node.name isEqualToString: @"height"]) {
+            rect.height = node.stringValue;
+        }
+    }
+    return rect;
+}
+-(void)setSkRect:(SKRect *)rect {
+    NSXMLElement *rectElement = [self firstElementByName:@"rect"];
+    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: @"x"]) {
+            [node setStringValue: rect.x];
+        } else if ([node.name isEqualToString: @"y"]) {
+            [node setStringValue: rect.y];
+        } else if ([node.name isEqualToString: @"width"]) {
+            [node setStringValue: rect.width];
+            if ([self.name isEqualToString:@"label"]) {
+                /// 修复lable宽度，自动布局时，宽度自适应
+                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+                [node setStringValue: fixW];
+            }
+        } else if ([node.name isEqualToString: @"height"]) {
+            [node setStringValue: rect.height];
+        }
+    }
+}
+
 -(NSString *)text {
     return [self m_getValueForKey:@"text"];
 }

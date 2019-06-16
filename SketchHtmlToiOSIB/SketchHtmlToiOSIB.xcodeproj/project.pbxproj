@@ -11,6 +11,7 @@
 		041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0B21CF588F00F7A999 /* XMFileItem.m */; };
 		0481C24022B5F0BD0013606E /* button.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0481C23F22B5F0BD0013606E /* button.xml */; };
 		0481C24322B5F2F20013606E /* NSXMLElement+Add.m in Sources */ = {isa = PBXBuildFile; fileRef = 0481C24222B5F2F20013606E /* NSXMLElement+Add.m */; };
+		048987F522B68A91009C4761 /* NSString+Add.m in Sources */ = {isa = PBXBuildFile; fileRef = 048987F422B68A91009C4761 /* NSString+Add.m */; };
 		980BF50421CF03670035FF08 /* label.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF4FF21CF03670035FF08 /* label.xml */; };
 		980BF50521CF03670035FF08 /* sb.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50021CF03670035FF08 /* sb.xml */; };
 		980BF50621CF03670035FF08 /* imageView.xml in Resources */ = {isa = PBXBuildFile; fileRef = 980BF50121CF03670035FF08 /* imageView.xml */; };
@@ -36,6 +37,8 @@
 		0481C23F22B5F0BD0013606E /* button.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = button.xml; sourceTree = "<group>"; };
 		0481C24122B5F2F20013606E /* NSXMLElement+Add.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSXMLElement+Add.h"; sourceTree = "<group>"; };
 		0481C24222B5F2F20013606E /* NSXMLElement+Add.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSXMLElement+Add.m"; sourceTree = "<group>"; };
+		048987F322B68A91009C4761 /* NSString+Add.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Add.h"; sourceTree = "<group>"; };
+		048987F422B68A91009C4761 /* NSString+Add.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Add.m"; sourceTree = "<group>"; };
 		19FF10D1413BFF328D13470B /* libPods-SketchHtmlToiOSIB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SketchHtmlToiOSIB.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		980BF4FF21CF03670035FF08 /* label.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = label.xml; sourceTree = "<group>"; };
 		980BF50021CF03670035FF08 /* sb.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sb.xml; sourceTree = "<group>"; };
@@ -163,6 +166,8 @@
 				981D4E2E21CE719000B16508 /* ViewController+Add.m */,
 				0481C24122B5F2F20013606E /* NSXMLElement+Add.h */,
 				0481C24222B5F2F20013606E /* NSXMLElement+Add.m */,
+				048987F322B68A91009C4761 /* NSString+Add.h */,
+				048987F422B68A91009C4761 /* NSString+Add.m */,
 				9815BDC921CD47E20048AD13 /* Main.storyboard */,
 				980BF50A21CF03960035FF08 /* other */,
 			);
@@ -291,6 +296,7 @@
 				9815BDCE21CD47E20048AD13 /* main.m in Sources */,
 				981D4E2621CE575C00B16508 /* NBSKObject.m in Sources */,
 				041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */,
+				048987F522B68A91009C4761 /* NSString+Add.m in Sources */,
 				9815BDC321CD47E10048AD13 /* AppDelegate.m in Sources */,
 				0481C24322B5F2F20013606E /* NSXMLElement+Add.m in Sources */,
 			);

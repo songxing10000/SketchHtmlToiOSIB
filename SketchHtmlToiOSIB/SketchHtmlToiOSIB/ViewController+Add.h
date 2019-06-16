@@ -12,41 +12,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ViewController (Add)
-#pragma mark - read save xml
-- (NSXMLElement *)rootElementWithXmlFileName:(NSString *)xmlFileName;
-- (NSXMLDocument *)documentWithXmlFileName:(NSString *)xmlFileName;
+
 - (NSString *)jsonStrWithHtmlFileAtPath:(NSString *)htmlFilePath;
 - (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object;
-- (BOOL)saveXMLDoucment:(NSXMLDocument *)XMLDoucment toPath:(NSString *)destPath;
-#pragma mark - get view add view
-- (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument;
-- (NSXMLElement *)getNewVCElement;
-- (NSXMLElement *)getNewlabelElement;
-- (NSXMLElement *)getNewImageViewElement;
-- (NSXMLElement *)getNewViewElement;
-- (void)setRandomIdForElement:(NSXMLElement *)element;
-#pragma mark - setProperty
-- (void)setRect:(SKRect *)rect forElement:(NSXMLElement *)element;
--(void)setTextAlign:(NSString *)textAlign forLabelElement:(NSXMLElement *)element;
-/// 背景alpha
--(void)setAlpha:(NSString *)alpha ForElement:(NSXMLElement *)element;
-
-/**
- 从css里提取一些属性，当bg颜色没有时，这里可能会出现一些border或者渐变色之类的相关属性
- */
--(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element;
-
-/**
- 页面在sb中的label
-
- @param text label
- @param element 页面元素
- */
--(void)setLable:(NSString *)text forVCElement:(NSXMLElement *)element;
-#pragma mark - id
--(NSString *)randomid;
-#pragma mark - other
-- (NSDictionary *)dicWithJsonStr:(NSString *)jsonString;
 @end
 
 NS_ASSUME_NONNULL_END
