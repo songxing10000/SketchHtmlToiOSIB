@@ -51,10 +51,10 @@ vc功能列表
 - [x] 加入view、label、imageView控件
 - [ ] 使用原生nav，导航栏，未移除，所有子控件y上移调整
 - [ ] 加入scrollView控件
-- [ ] 自动识别控件重叠，转换为button控件
+- [x] 自动识别控件重叠，转换为button控件
 - [ ] 自动识别控件复用，转换为table控件
 - [ ] 大控件遮住了小控件，调整控件层级功能
-- [ ] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
+- [x] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
 ***
 button功能列表(目前只能识别根view下的button)
 - [x] 背景颜色
