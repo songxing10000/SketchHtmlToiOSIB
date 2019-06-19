@@ -355,7 +355,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             if (!hasThisFolder) {
                 return ;
             }
-            NSString *copyToFolderFilePath = @"/Users/mac/Desktop/temp.xcassets/temp";
+            NSString *copyToFolderFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@"temp.storyboard" withString:@"temp.xcassets/temp"];
             NSDirectoryEnumerator *myDirectoryEnumerator = [fm enumeratorAtPath: assetsFilePath];
             NSString *assetsFolderInnerfileName = nil;
             while((assetsFolderInnerfileName = [myDirectoryEnumerator nextObject]))
