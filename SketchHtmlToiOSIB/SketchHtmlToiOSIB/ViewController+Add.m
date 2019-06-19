@@ -9,6 +9,49 @@
 #import "ViewController+Add.h"
 #import "NSXMLElement+Add.h"
 #import "NSString+Add.h"
+
+void createFolderAtPath(NSString *folderFilePath, BOOL needRemoveOld) {
+    
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL isDir = NO;
+    BOOL isFileExists = [fm fileExistsAtPath: folderFilePath isDirectory: &isDir];
+    if (isFileExists) {
+        if (!isDir) {
+            [fm createDirectoryAtPath:folderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+        } else {
+            if (needRemoveOld) {
+                [fm removeItemAtPath: folderFilePath error:nil];
+                [fm createDirectoryAtPath: folderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+            } else {
+                
+            }
+        }
+    } else {
+        [fm createDirectoryAtPath:folderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+}
+void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveOld) {
+    
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL isDir = NO;
+    BOOL isFileExists = [fm fileExistsAtPath: filePath isDirectory: &isDir];
+    if (isFileExists) {
+        if (!isDir) {
+            if (needRemoveOld) {
+                [fm removeItemAtPath: filePath error:nil];
+                [fm copyItemAtPath:copyFilePath toPath:filePath error:nil];
+            } else {
+                
+            }
+        } else {
+            [fm copyItemAtPath:copyFilePath toPath:filePath error:nil];
+        }
+    } else {
+        
+        [fm copyItemAtPath:copyFilePath toPath:filePath error:nil];
+    }
+}
+
 @implementation ViewController (Add)
 #pragma mark - read save xml
 
@@ -276,6 +319,24 @@
             [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
             
             [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
+            
+            
+            
+            NSString *proFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@".storyboard" withString:@".xcodeproj"];
+            createFolderAtPath(proFilePath, NO);
+            
+            // move file
+            NSString *fil1Path = [[NSBundle mainBundle] pathForResource: @"project"
+                                                                    ofType:@"pbxproj"];
+            NSString *path1 = [proFilePath stringByAppendingPathComponent: @"project.pbxproj"];
+            NSString *path1Content =
+            [NSString stringWithContentsOfFile:fil1Path encoding:NSUTF8StringEncoding error:nil];
+            NSError *error;
+            [path1Content writeToFile:path1 atomically:YES encoding:NSUTF8StringEncoding error: &error];
+            if(error != nil) {
+                NSLog(@"---%@---", error.localizedDescription);
+            }
+            
         }
         
     }

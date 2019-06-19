@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0921CF566200F7A999 /* XMDragView.m */; };
 		041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0B21CF588F00F7A999 /* XMFileItem.m */; };
+		0472C40E22BA29F3008BA6B0 /* project.pbxproj in Resources */ = {isa = PBXBuildFile; fileRef = 0472C40D22BA29F3008BA6B0 /* project.pbxproj */; };
 		0481C24022B5F0BD0013606E /* button.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0481C23F22B5F0BD0013606E /* button.xml */; };
 		0481C24322B5F2F20013606E /* NSXMLElement+Add.m in Sources */ = {isa = PBXBuildFile; fileRef = 0481C24222B5F2F20013606E /* NSXMLElement+Add.m */; };
 		048987F522B68A91009C4761 /* NSString+Add.m in Sources */ = {isa = PBXBuildFile; fileRef = 048987F422B68A91009C4761 /* NSString+Add.m */; };
@@ -34,6 +35,7 @@
 		041C6D0921CF566200F7A999 /* XMDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDragView.m; sourceTree = "<group>"; };
 		041C6D0B21CF588F00F7A999 /* XMFileItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMFileItem.m; sourceTree = "<group>"; };
 		041C6D0C21CF588F00F7A999 /* XMFileItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMFileItem.h; sourceTree = "<group>"; };
+		0472C40D22BA29F3008BA6B0 /* project.pbxproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.pbxproject; path = project.pbxproj; sourceTree = "<group>"; };
 		0481C23F22B5F0BD0013606E /* button.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = button.xml; sourceTree = "<group>"; };
 		0481C24122B5F2F20013606E /* NSXMLElement+Add.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSXMLElement+Add.h"; sourceTree = "<group>"; };
 		0481C24222B5F2F20013606E /* NSXMLElement+Add.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSXMLElement+Add.m"; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		980BF4FE21CF03670035FF08 /* xml */ = {
 			isa = PBXGroup;
 			children = (
+				0472C40D22BA29F3008BA6B0 /* project.pbxproj */,
 				980BF4FF21CF03670035FF08 /* label.xml */,
 				980BF50021CF03670035FF08 /* sb.xml */,
 				980BF50121CF03670035FF08 /* imageView.xml */,
@@ -246,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0472C40E22BA29F3008BA6B0 /* project.pbxproj in Resources */,
 				980BF50421CF03670035FF08 /* label.xml in Resources */,
 				980BF50721CF03670035FF08 /* view.xml in Resources */,
 				980BF50821CF03670035FF08 /* vc.xml in Resources */,
