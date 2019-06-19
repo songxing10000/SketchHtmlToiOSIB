@@ -282,13 +282,15 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                     NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
                     aNewWillBeAddedViewElement.skRect = oldSelfR;
                     [self moveSubviewElement: aNewWillBeAddedViewElement
-                          toSuperViewElement: findedSuperViewInSuperViewElement];
+                          toSuperViewElement: findedSuperViewInSuperViewElement
+                              fromSbDocument: sbDocument];
                     
                     break;
                 }
                 if (!hasSuperViewInSuperView) {
                     [self moveSubviewElement: aNewWillBeAddedViewElement
-                          toSuperViewElement: superViewInRootViewElement];
+                          toSuperViewElement: superViewInRootViewElement
+                              fromSbDocument: sbDocument];
                 } else {
                     NSLog(@"---%@---",@"ff");
                 }
@@ -353,7 +355,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             if (!hasThisFolder) {
                 return ;
             }
-            NSString *copyToFolderFilePath = @"/Users/mac/Desktop/temp.xcassets";
+            NSString *copyToFolderFilePath = @"/Users/mac/Desktop/temp.xcassets/temp";
             NSDirectoryEnumerator *myDirectoryEnumerator = [fm enumeratorAtPath: assetsFilePath];
             NSString *assetsFolderInnerfileName = nil;
             while((assetsFolderInnerfileName = [myDirectoryEnumerator nextObject]))
@@ -577,7 +579,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 oldSelfR.y = [NSString stringWithFormat:@"%zd", ( firstSuperSKRect.y.integerValue-oldSelfR.y.integerValue)];
                 button.skRect = oldSelfR;
                 
-                [self moveSubviewElement:button toSuperViewElement: rootViewSubE];
+                [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument];
             }
         }];
     }];
@@ -608,7 +610,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 }
 #pragma mark - get view add view
 /// 移动子元素到父元素内，添加子view到其父view上
-- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement {
+- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument {
     
     if (!subViewElement) {
         NSLog(@"未找到 %@", subViewElement);
@@ -634,6 +636,29 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     subViewElement.skRect = oldSelfR;
     // 考虑 更新 x y
     [subViewSuperView addChild:subViewElement];
+    
+    if ([subViewElement.name isEqualToString:@"imageView"]) {
+        //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
+        
+        NSXMLElement *imageNode = [NSXMLElement elementWithName:@"image"];
+        NSString *imgName = [subViewElement attributeForName:@"image"].stringValue;
+        
+        if (imgName && imgName.length > 0) {
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"name" stringValue: imgName]];
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"width" stringValue:@"16"]];
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
+            NSXMLElement *resources =
+            [sbDocument.rootElement firstElementByName:@"resources"];
+            NSMutableArray<NSString *> *imgNames = [NSMutableArray array];
+            for (NSXMLElement * obj in [resources children]) {
+                [imgNames addObject: [obj m_getValueForKey:@"name"]];
+            }
+            
+            if (![imgNames containsObject: imgName]) {
+                [resources addChild:imageNode.copy];
+            }
+        }
+    }
 }
 - (NSXMLElement *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
     if (!vcElement) {
@@ -699,7 +724,14 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
             NSXMLElement *resources =
             [sbDocument.rootElement firstElementByName:@"resources"];
-            [resources addChild:imageNode.copy];
+            NSMutableArray<NSString *> *imgNames = [NSMutableArray array];
+            for (NSXMLElement * obj in [resources children]) {
+                [imgNames addObject: [obj m_getValueForKey:@"name"]];
+            }
+            
+            if (![imgNames containsObject: imgName]) {
+                [resources addChild:imageNode.copy];
+            }
         }
     }
 }
