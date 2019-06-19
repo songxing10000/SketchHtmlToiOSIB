@@ -541,7 +541,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             NSArray<NSString *> *names2 = [subEs2 valueForKeyPath:@"name"];
             BOOL isOnleText = names2.count == 1 && [names2 containsObject: @"label"];
             BOOL isTextAndImg = subEs2.count == 2 && [names2 containsObject: @"label"] &&
-            [names containsObject: @"imageView"];
+            [names2 containsObject: @"imageView"];
             if ([rootViewSubSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
                 
                 NSXMLElement *label;
@@ -550,7 +550,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                     
                 } else if (isTextAndImg) {
                     
-                    label = subEs2[[names indexOfObject: @"label"]];
+                    label = subEs2[[names2 indexOfObject: @"label"]];
                 }
                 // view 包含一个  label
                 NSXMLElement *button = [self getNewButtonElement];
