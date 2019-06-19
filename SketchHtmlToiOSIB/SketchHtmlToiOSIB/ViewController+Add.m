@@ -271,7 +271,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                     SKRect *oldSelfR =  aNewWillBeAddedViewElement.skRect;
                     oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
                     oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - firstSuperSKRect.y.integerValue)];
-                    
+                    if (oldSelfR.y.integerValue <= 0) {
+                        oldSelfR.y = @"0";
+                    }
                     
                     if (! CGRectContainsRect(superViewInSuperViewCGRect, [self getCGRectFromSKRect:oldSelfR]) ) {
                         continue;
@@ -506,6 +508,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             }
             // view 包含一个  label
             NSXMLElement *button = [self getNewButtonElement];
+            if (rootViewSubE.skRect.y.integerValue < 0) {
+                rootViewSubE.skRect.y = @"0";
+            }
             // 更新button frame
             button.skRect = rootViewSubE.skRect;
             // 更新 bgColor
@@ -576,7 +581,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 /// 坐标系转换
                 SKRect *oldSelfR = button.skRect;
                 oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
-                oldSelfR.y = [NSString stringWithFormat:@"%zd", ( firstSuperSKRect.y.integerValue-oldSelfR.y.integerValue)];
+                NSInteger yStart = firstSuperSKRect.y.integerValue - oldSelfR.y.integerValue;
+                if (yStart < 0) {
+                    yStart = 0;
+                }
+                oldSelfR.y = [NSString stringWithFormat:@"%zd", yStart];
                 button.skRect = oldSelfR;
                 
                 [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument];
@@ -632,7 +641,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     /// 更新 移动到父控件里的x y
     oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
     oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
-    
+    if (oldSelfR.y.integerValue <= 0) {
+        oldSelfR.y = @"0";
+    }
     subViewElement.skRect = oldSelfR;
     // 考虑 更新 x y
     [subViewSuperView addChild:subViewElement];
