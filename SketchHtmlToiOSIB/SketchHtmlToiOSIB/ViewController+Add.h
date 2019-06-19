@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ViewController (Add)
 
 - (NSString *)jsonStrWithHtmlFileAtPath:(NSString *)htmlFilePath;
-- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object;
+- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath;
 @end
 
 NS_ASSUME_NONNULL_END

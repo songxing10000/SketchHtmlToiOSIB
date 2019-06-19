@@ -30,7 +30,7 @@
     NSString *jsonStr = [self jsonStrWithHtmlFileAtPath:htmlFilePath];
     NBSKObject *skObj = [NBSKObject objWithJSON:jsonStr];
     NSString *storyboardDestPath = [[self desktopFolderFilePath] stringByAppendingPathComponent:@"temp.storyboard"];
-    [self createSBFileAtPath:storyboardDestPath withObj:skObj];
+    [self createSBFileAtPath:storyboardDestPath withObj:skObj htmlFilePath: htmlFilePath];
 }
 - (NSString*)desktopFolderFilePath
 {

@@ -152,7 +152,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
     return NO;
 }
-- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object {
+- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath {
     if (!sbDesPath || !object) {
         return;
     }
@@ -339,7 +339,132 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             
             // 生成图片夹
             
+            NSFileManager *fm = [NSFileManager defaultManager];
             
+            
+//            NSString *htmlFileName = @"index.html";
+//            NSString *htmlFilePath = [NSString stringWithFormat: @"/Users/mac/Desktop/f/%@", htmlFileName];
+            NSString *assetsFileName = @"assets";
+            NSString *assetsFilePath =
+            [htmlFilePath stringByReplacingOccurrencesOfString: @"index.html" withString: assetsFileName];
+            BOOL isDir = NO;
+            BOOL hasThisFolder =
+            [fm fileExistsAtPath: assetsFilePath isDirectory: &isDir] && isDir ;
+            if (!hasThisFolder) {
+                return ;
+            }
+            NSString *copyToFolderFilePath = @"/Users/mac/Desktop/temp.xcassets";
+            NSDirectoryEnumerator *myDirectoryEnumerator = [fm enumeratorAtPath: assetsFilePath];
+            NSString *assetsFolderInnerfileName = nil;
+            while((assetsFolderInnerfileName = [myDirectoryEnumerator nextObject]))
+            {
+                BOOL isDir = YES;
+                NSString *assetsFolderInnerfilePath = [assetsFilePath stringByAppendingPathComponent: assetsFolderInnerfileName];
+                BOOL isFileExist = [fm fileExistsAtPath:assetsFolderInnerfilePath isDirectory:&isDir];
+                if (!isFileExist) {
+                    
+                    //                return nil;
+                } else {
+                    if (isDir) {
+                        NSLog(@"---%@---", assetsFolderInnerfileName);
+                        
+                    } else {
+                        
+                        NSString *makeFolderName =
+                        [[[[assetsFolderInnerfileName stringByReplacingOccurrencesOfString: @"@2x.png" withString:@""] stringByReplacingOccurrencesOfString: @"@3x.png" withString:@""]  stringByReplacingOccurrencesOfString: @".png" withString:@""] stringByAppendingString: @".imageset"];
+                        NSString *makeFolderFilePath =
+                        [copyToFolderFilePath stringByAppendingPathComponent: makeFolderName];
+                        BOOL isDir = YES;
+                        BOOL isFileExist = [fm fileExistsAtPath: makeFolderFilePath isDirectory:&isDir];
+                        NSString *assetsFolderInnerfileNewFilePath = [makeFolderFilePath stringByAppendingPathComponent: assetsFolderInnerfileName];
+                        /// 删除之前老的，直接用新的
+                        if ([fm fileExistsAtPath: assetsFolderInnerfileNewFilePath]) {
+                            [fm removeItemAtPath:assetsFolderInnerfileNewFilePath error:nil];
+                        }
+                        if (isFileExist) {
+                            
+                            if (isDir) {
+                                NSError *er = nil;
+                                [fm copyItemAtPath:assetsFolderInnerfilePath toPath: assetsFolderInnerfileNewFilePath error: &er];
+                                if (er != nil) {
+                                    NSLog(@"---%@---", er.localizedDescription);
+                                }
+                            } else {
+                                [fm createDirectoryAtPath:makeFolderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+                                NSLog(@"---%@---", makeFolderFilePath);
+                                
+                                [fm copyItemAtPath:assetsFolderInnerfilePath toPath:assetsFolderInnerfileNewFilePath error:nil];
+                            }
+                        } else {
+                            [fm createDirectoryAtPath:makeFolderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+                            NSLog(@"---%@---", makeFolderFilePath);
+                            
+                            [fm copyItemAtPath:assetsFolderInnerfilePath toPath:assetsFolderInnerfileNewFilePath error:nil];
+                        }
+                        
+                    }
+                }
+                
+            }
+            
+            // 生成json
+            NSArray<NSString *> *copyToFolderInnerFileNames = [fm contentsOfDirectoryAtPath: copyToFolderFilePath error: nil];
+            
+            [copyToFolderInnerFileNames enumerateObjectsUsingBlock:^(NSString * _Nonnull copyToFolderInnerFileName, NSUInteger idx, BOOL * _Nonnull stop) {
+                
+                
+                NSString *copyToFolderInnerFilePath = [copyToFolderFilePath stringByAppendingPathComponent: copyToFolderInnerFileName];
+                BOOL isDir = NO;
+                [fm fileExistsAtPath:copyToFolderInnerFilePath isDirectory: &isDir];
+                if (isDir) {
+                    NSArray<NSString *> *copyToFolderInnerFileFolderInnerFileNames = [fm contentsOfDirectoryAtPath: copyToFolderInnerFilePath error: nil];
+                    NSMutableDictionary *contentsJSONDict =
+                    @{
+                      @"images" : @[
+                              @{
+                                  @"idiom" : @"universal",
+                                  @"scale" : @"1x"
+                                  },
+                              @{
+                                  @"idiom" : @"universal",
+                                  @"scale" : @"2x"
+                                  },
+                              @{
+                                  @"idiom" : @"universal",
+                                  @"scale" : @"3x"
+                                  }
+                              ],
+                      @"info" : @{
+                              @"version" : @1,
+                              @"author" : @"xcode"
+                              }
+                      }.mutableCopy;
+                    [copyToFolderInnerFileFolderInnerFileNames enumerateObjectsUsingBlock:^(NSString * _Nonnull copyToFolderInnerFileFolderInnerFileName, NSUInteger idx, BOOL * _Nonnull stop) {
+                        if ([copyToFolderInnerFileFolderInnerFileName hasSuffix:@".png"]) {
+                            NSString *JSONFilePath = [copyToFolderInnerFilePath stringByAppendingPathComponent:  @"Contents.json"];
+                            NSUInteger idx = 0;
+                            if ([copyToFolderInnerFileFolderInnerFileName hasSuffix:@"@3x.png"]) {
+                                //       "filename" : "编辑@2x.png",
+                                idx = 2;
+                            } else if ([copyToFolderInnerFileFolderInnerFileName hasSuffix:@"@2x.png"]) {
+                                idx = 1;
+                            }
+                            NSMutableArray *muArr = [contentsJSONDict[@"images"] mutableCopy];
+                            NSMutableDictionary *muDict = [muArr[idx] mutableCopy];
+                            muDict[@"filename"] = copyToFolderInnerFileFolderInnerFileName;
+                            muArr[idx] = muDict;
+                            contentsJSONDict[@"images"] = muArr;
+                            
+                            NSData *jsonData = [NSJSONSerialization dataWithJSONObject: contentsJSONDict options:NSJSONWritingPrettyPrinted error: nil];
+                            NSString *JSONString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                            if ([fm fileExistsAtPath:JSONFilePath]) {
+                                [fm removeItemAtPath:JSONFilePath error:nil];
+                            }
+                            [JSONString writeToFile:JSONFilePath atomically:YES encoding: NSUTF8StringEncoding error:nil];
+                        }
+                    }];
+                }
+            }];
             
             
             // 打开临时工程
