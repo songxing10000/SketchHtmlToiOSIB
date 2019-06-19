@@ -336,6 +336,14 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             if(error != nil) {
                 NSLog(@"---%@---", error.localizedDescription);
             }
+            
+            // 生成图片夹
+            
+            
+            
+            
+            // 打开临时工程
+            
             [[NSWorkspace sharedWorkspace] selectFile:proFilePath inFileViewerRootedAtPath:proFilePath];
             
             [[NSWorkspace sharedWorkspace] openFile:proFilePath withApplication:@"Xcode"];
