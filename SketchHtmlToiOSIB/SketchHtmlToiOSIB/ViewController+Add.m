@@ -194,7 +194,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             else if ([viewType isEqualToString:@"slice"]) {
                 //图片
 #pragma mark - UIImageView
-                NSXMLElement *imgElement = [self getNewImageViewElement];
+                NSXMLElement *imgElement = [self getNewImageViewElementWithImgName: view.name];
                 // image="fff.png"
                 aNewWillBeAddedViewElement = imgElement;
             }
@@ -316,9 +316,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
         if (scenes.childCount == object.artboards.count) {
             NSLog(@"----%@---", @"写入完成");
-            [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
-            
-            [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
+//            [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
+//
+//            [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
             
             
             
@@ -336,7 +336,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             if(error != nil) {
                 NSLog(@"---%@---", error.localizedDescription);
             }
+            [[NSWorkspace sharedWorkspace] selectFile:proFilePath inFileViewerRootedAtPath:proFilePath];
             
+            [[NSWorkspace sharedWorkspace] openFile:proFilePath withApplication:@"Xcode"];
         }
         
     }
@@ -551,8 +553,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     //    }
     
     [subViewSuperView addChild:subViewElement];
-    /// 暂不处理图片信息
-    return;
+    
     if ([subViewElement.name isEqualToString:@"imageView"]) {
         //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
         
@@ -599,8 +600,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     return lableElement.copy;
 }
 /// name imageView"
-- (NSXMLElement *)getNewImageViewElement {
+- (NSXMLElement *)getNewImageViewElementWithImgName:(NSString *)imgName {
     NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imageView"];
+    [imgVElement m_setValue: imgName forKey: @"image"];
     [self setRandomIdForElement:imgVElement];
     return imgVElement.copy;
 }
