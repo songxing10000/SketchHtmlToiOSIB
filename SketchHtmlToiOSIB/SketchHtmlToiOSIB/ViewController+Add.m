@@ -180,16 +180,35 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             NSString *viewType = view.type;
             /// 将要被添加的新的 view NSXMLElement 对象
             NSXMLElement *aNewWillBeAddedViewElement = nil;
-#pragma mark - UILabel
             if ([viewType isEqualToString:@"text"]) {
-                // 文本
-                NSXMLElement *labelElement = [self getNewlabelElement];
-                labelElement.text = view.content;
-                labelElement.fontSize = view.fontSize;
-                labelElement.fontStyle = view.fontFace;
-                labelElement.textColor =
-                [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
-                aNewWillBeAddedViewElement = labelElement;
+                if ([view.content hasPrefix: @"请输入"] ||
+                    [view.content hasPrefix: @"请填写"]) {
+#pragma mark - UITextFiled
+                    // 输入框
+                    NSXMLElement *textFiledElement = [self getNewTextFiledElement];
+                    // placeholder
+                    [textFiledElement m_setValue: view.content forKey: @"placeholder"];
+                    
+                    textFiledElement.fontSize = view.fontSize;
+                    textFiledElement.fontStyle = view.fontFace;
+                    // placeholder 颜色xml内置
+                    // 正常情况下的文字颜色 xml内置
+                    
+                    //                    textFiledElement.textColor =
+//                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
+                    aNewWillBeAddedViewElement = textFiledElement;
+                } else {
+#pragma mark - UILabel
+
+                    // 文本
+                    NSXMLElement *labelElement = [self getNewlabelElement];
+                    labelElement.text = view.content;
+                    labelElement.fontSize = view.fontSize;
+                    labelElement.fontStyle = view.fontFace;
+                    labelElement.textColor =
+                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
+                    aNewWillBeAddedViewElement = labelElement;
+                }
             }
             else if ([viewType isEqualToString:@"slice"]) {
                 //图片
@@ -764,6 +783,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self setRandomIdForElement:viewLayoutGuide];
     
     return vcElement.copy;
+}
+- (NSXMLElement *)getNewTextFiledElement {
+    NSXMLElement *textFiledElement = [self rootElementWithXmlFileName:@"textField"];
+    [self setRandomIdForElement:textFiledElement];
+    return textFiledElement.copy;
 }
 - (NSXMLElement *)getNewlabelElement {
     NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"label"];

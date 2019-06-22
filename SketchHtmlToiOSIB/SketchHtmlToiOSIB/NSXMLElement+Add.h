@@ -19,9 +19,9 @@
 @property(nonatomic, copy) NSString *textColor;
 /// button中的label的color
 @property(nonatomic, copy) NSString *normalTitleColor;
-/// label button
+/// label button textFiled
 @property(nonatomic, copy) NSString *fontSize;
-/// label button 字的样式类型如 苹方-简 常规体
+/// label button textFiled 字的样式类型如 苹方-简 常规体
 @property(nonatomic, copy) NSString *fontStyle;
 @property(nonatomic, strong) SKRect *skRect;
 @property(nonatomic, assign) CGRect cgRect;
