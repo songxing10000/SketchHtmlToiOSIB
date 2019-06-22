@@ -10,6 +10,12 @@
 #import "NSXMLElement+Add.h"
 #import "NSString+Add.h"
 
+/**
+ 在路径创建文件夹
+
+ @param folderFilePath 要创建的文件夹的全路径
+ @param needRemoveOld 如果之前存在，需要删除老的不
+ */
 void createFolderAtPath(NSString *folderFilePath, BOOL needRemoveOld) {
     
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -30,6 +36,14 @@ void createFolderAtPath(NSString *folderFilePath, BOOL needRemoveOld) {
         [fm createDirectoryAtPath:folderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
     }
 }
+
+/**
+ 复制文件到另一处
+
+ @param copyFilePath 要复制的源文件
+ @param filePath 要复制文件去哪个位置
+ @param needRemoveOld 如果之前存在，需要删除老的不
+ */
 void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveOld) {
     
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -135,6 +149,12 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSString *subString = [text substringWithRange:NSMakeRange(start, end - start)];
     return subString ;
 }
+
+/**
+ 忽略某个view不加入到页面上
+
+ @param view 要判断的view
+ */
 - (BOOL)canIgnoreView:(SKLayer *)view {
     if (!view.objectID) {
         return YES;
@@ -214,7 +234,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 //图片
 #pragma mark - UIImageView
                 NSXMLElement *imgElement = [self getNewImageViewElementWithImgName: view.name];
-                // image="fff.png"
                 aNewWillBeAddedViewElement = imgElement;
             }
             else if ([viewType isEqualToString:@"shape"]) {
@@ -354,6 +373,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             NSString *path1 = [proFilePath stringByAppendingPathComponent: @"project.pbxproj"];
             NSString *path1Content =
             [NSString stringWithContentsOfFile:fil1Path encoding:NSUTF8StringEncoding error:nil];
+            NSFileManager *fm = [NSFileManager defaultManager];
+            [fm removeItemAtPath:path1 error: nil];
             NSError *error;
             [path1Content writeToFile:path1 atomically:YES encoding:NSUTF8StringEncoding error: &error];
             if(error != nil) {
@@ -362,7 +383,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             
             // 生成图片夹
             
-            NSFileManager *fm = [NSFileManager defaultManager];
             
             
 //            NSString *htmlFileName = @"index.html";
