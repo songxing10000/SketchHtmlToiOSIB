@@ -68,4 +68,12 @@ view功能列表
 
 ***
 imageView功能列表
+- [x] rect
+- [x] 载入图片
+***
+textField功能列表
+- [x] rect
+- [x] placeholder文字
+- [x] 字号，字体
+- [x] 先把问题简单化，placeholder文字颜色、输入后显示文字的颜色内部写死
 
