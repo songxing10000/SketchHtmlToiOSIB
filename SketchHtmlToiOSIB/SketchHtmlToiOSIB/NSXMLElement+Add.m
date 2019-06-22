@@ -276,8 +276,12 @@
         } else if ([node.name isEqualToString: @"blue"]) {
             [node setStringValue: rgba[2]];
         } else if ([node.name isEqualToString: @"alpha"]) {
-            
-            [node setStringValue: [rgba[3] stringByReplacingOccurrencesOfString: @")" withString:@""]];
+            NSString *alphaStr = [rgba[3] stringByReplacingOccurrencesOfString: @")" withString:@""];
+            if ( alphaStr.length == 0 ) {
+                // 修复可能出错的情况
+                alphaStr = @"1";
+            }
+            [node setStringValue: alphaStr];
         }
         
     }

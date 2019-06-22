@@ -183,11 +183,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-                if (![vc.name isEqualToString: @"设置"]) {
-                    NSLog(@"---%@---", vc.name);
-                continue;
-
-                }
+//                if (![vc.name isEqualToString: @"编辑员工信息"]) {
+//                    NSLog(@"---%@---", vc.name);
+//                continue;
+//
+//                }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
@@ -240,13 +240,14 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 //view
 #pragma mark - UIView
                 if ([view.rect.width isEqualToString: @"375"] &&
-                    [view.rect.height isEqualToString: @"667"]) {
+                    [view.rect.height isEqualToString: @"646"]) {
                     NSLog(@"---%@---",@"fsdf");
                 }
                 NSXMLElement *viewElement = [self getNewViewElement];
                 if (view.fills && view.fills.count > 0) {
                     viewElement.backgroundColor = view.fills[0].color.uiColor ;
-                } else if (view.css && view.css.count > 0) {
+                }
+                if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
                 }
                 aNewWillBeAddedViewElement = viewElement;
@@ -891,8 +892,20 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 
 
 -(void)setViewCss:(NSArray <NSString *> *)css ForElement:(NSXMLElement *)element {
+    if (css.count > 1 && [css[0] hasPrefix: @"opacity: 0."]) {
+        // 需要设置弹窗背景颜色
+        NSXMLElement *colorE = [element firstElementByName: @"color"];
+        NSString *keyValue = [colorE m_getValueForKey: @"key"];
+        if ([keyValue isEqualToString: @"backgroundColor"]) {
+            NSString *cssStr = [css[0] stringByReplacingOccurrencesOfString: @";" withString: @""];
+            NSString *colorAlpha = [cssStr componentsSeparatedByString: @":"][1];
+            [colorE m_setValue: colorAlpha forKey: @"alpha"];
+        }
+        
+    }
 #pragma mark - to do
     // ["border: 1px solid #295DFD;","border-radius: 4px;"]
+    NSLog(@"---%@---", css);
     [css enumerateObjectsUsingBlock:^(NSString * _Nonnull str, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([str hasPrefix:@"border:"]) {
             
