@@ -183,11 +183,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-//                if (![vc.name isEqualToString: @"轻易贷登陆"]) {
-//                    NSLog(@"---%@---", vc.name);
-//                continue;
-//        
-//                }
+                if (![vc.name isEqualToString: @"编辑员工信息"]) {
+                    NSLog(@"---%@---", vc.name);
+                continue;
+        
+                }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
@@ -254,7 +254,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             }
             
             if (view.opacity) {
-                [self setAlpha:view.opacity ForElement:aNewWillBeAddedViewElement];
+                // 暂忽略 透明度，用到的场景太少
+//                [self setAlpha:view.opacity ForElement:aNewWillBeAddedViewElement];
             }
             aNewWillBeAddedViewElement.skRect = view.rect;
             if ([view.rect.y isEqualToString: @"30"]||
@@ -323,14 +324,16 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                     aNewWillBeAddedViewElement.skRect = oldSelfR;
                     [self moveSubviewElement: aNewWillBeAddedViewElement
                           toSuperViewElement: findedSuperViewInSuperViewElement
-                              fromSbDocument: sbDocument];
+                              fromSbDocument: sbDocument
+                                needChangeXY: YES];
                     
                     break;
                 }
                 if (!hasSuperViewInSuperView) {
                     [self moveSubviewElement: aNewWillBeAddedViewElement
                           toSuperViewElement: superViewInRootViewElement
-                              fromSbDocument: sbDocument];
+                              fromSbDocument: sbDocument
+                                needChangeXY: YES];
                 } else {
                     NSLog(@"---%@---",@"ff");
                 }
@@ -634,14 +637,14 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 /// 坐标系转换
                 SKRect *oldSelfR = button.skRect;
                 oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
-                NSInteger yStart = oldSelfR.y.integerValue - firstSuperSKRect.y.integerValue;
+                NSInteger yStart = oldSelfR.y.integerValue - firstSuperSKRect.y.doubleValue;
                 if (yStart < 0) {
                     yStart = 0;
                 }
                 oldSelfR.y = [NSString stringWithFormat:@"%zd", yStart];
-                button.skRect = oldSelfR;
+//                button.skRect = oldSelfR;
                 
-                [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument];
+                [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument needChangeXY:NO];
             }
         }];
     }];
@@ -672,7 +675,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 }
 #pragma mark - get view add view
 /// 移动子元素到父元素内，添加子view到其父view上
-- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument {
+- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument needChangeXY:(BOOL)needChangeXY{
     
     if (!subViewElement) {
         NSLog(@"未找到 %@", subViewElement);
@@ -689,15 +692,18 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         
         return;
     }
-    SKRect *oldSuperR = superViewElement.skRect;
-    SKRect *oldSelfR = subViewElement.skRect;
-    /// 更新 移动到父控件里的x y
-    oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
-    oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
-    if (oldSelfR.y.integerValue <= 0) {
-        oldSelfR.y = @"0";
+    if (needChangeXY) {
+        SKRect *oldSuperR = superViewElement.skRect;
+        SKRect *oldSelfR = subViewElement.skRect;
+        /// 更新 移动到父控件里的x y
+        oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
+        oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
+        if (oldSelfR.y.integerValue <= 0) {
+            oldSelfR.y = @"0";
+        }
+        subViewElement.skRect = oldSelfR;
     }
-    subViewElement.skRect = oldSelfR;
+    
     // 考虑 更新 x y
     [subViewSuperView addChild:subViewElement];
     
