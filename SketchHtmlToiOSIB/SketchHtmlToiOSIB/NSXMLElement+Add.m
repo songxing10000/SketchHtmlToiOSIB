@@ -268,7 +268,6 @@
     color = [color stringByReplacingOccurrencesOfString:@"b:" withString:@""];
     color = [color stringByReplacingOccurrencesOfString:@"a:" withString:@""];
     NSArray<NSString *> *rgba = [color componentsSeparatedByString:@" "];
-    
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"red"]) {
             [node setStringValue: rgba[0]];
@@ -276,8 +275,9 @@
             [node setStringValue: rgba[1]];
         } else if ([node.name isEqualToString: @"blue"]) {
             [node setStringValue: rgba[2]];
-        } else if ([node.name isEqualToString: @"realphad"]) {
-            [node setStringValue: rgba[3]];
+        } else if ([node.name isEqualToString: @"alpha"]) {
+            
+            [node setStringValue: [rgba[3] stringByReplacingOccurrencesOfString: @")" withString:@""]];
         }
         
     }

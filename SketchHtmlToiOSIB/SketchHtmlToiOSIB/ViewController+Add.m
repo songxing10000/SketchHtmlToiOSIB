@@ -183,10 +183,10 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-                if (![vc.name isEqualToString: @"编辑员工信息"]) {
+                if (![vc.name isEqualToString: @"设置"]) {
                     NSLog(@"---%@---", vc.name);
                 continue;
-        
+
                 }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
@@ -239,11 +239,14 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             else if ([viewType isEqualToString:@"shape"]) {
                 //view
 #pragma mark - UIView
+                if ([view.rect.width isEqualToString: @"375"] &&
+                    [view.rect.height isEqualToString: @"667"]) {
+                    NSLog(@"---%@---",@"fsdf");
+                }
                 NSXMLElement *viewElement = [self getNewViewElement];
                 if (view.fills && view.fills.count > 0) {
                     viewElement.backgroundColor = view.fills[0].color.uiColor ;
-                }
-                if (view.css && view.css.count > 0) {
+                } else if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
                 }
                 aNewWillBeAddedViewElement = viewElement;
