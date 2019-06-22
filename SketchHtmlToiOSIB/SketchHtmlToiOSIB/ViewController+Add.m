@@ -163,11 +163,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-        //        if (![vc.name isEqualToString: @"客户详情"]) {
-        //
-        //        continue;
-        //
-        //        }
+//                if (![vc.name isEqualToString: @"轻易贷登陆"]) {
+//                    NSLog(@"---%@---", vc.name);
+//                continue;
+//        
+//                }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
@@ -581,7 +581,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 /// 坐标系转换
                 SKRect *oldSelfR = button.skRect;
                 oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
-                NSInteger yStart = firstSuperSKRect.y.integerValue - oldSelfR.y.integerValue;
+                NSInteger yStart = oldSelfR.y.integerValue - firstSuperSKRect.y.integerValue;
                 if (yStart < 0) {
                     yStart = 0;
                 }
