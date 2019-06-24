@@ -23,15 +23,19 @@
 转换文件来源
 - [x] 本地文件
 - [ ] 网络url,存储到本地
+
 ***
 输出格式
 - [x] sb格式
 - [ ] xib格式
 - [ ] 手码格式
+
+
 ***
 sb功能列表
 - [x] 读取页面个数，生成对应个数的控制器
 - [ ] 载入图片资源
+
 ***
 vc功能列表
 - [x] 根据title生成控制器sb中的label
@@ -42,11 +46,13 @@ vc功能列表
 - [ ] 自动识别控件复用，转换为table控件
 - [ ] 大控件遮住了小控件，调整控件层级功能
 - [x] 最后个子控件超出屏幕后，设置vc的simulated size 为freeform，并更新height
+
 ***
 button功能列表(目前只能识别根view下的button)
 - [x] 背景颜色
 - [x] 字样式及大小
 - [x] normal状态下的文字及文字颜色
+
 ***
 label功能列表
 - [x] text
@@ -58,6 +64,7 @@ label功能列表
 - [x] 识别 Helvetica
 - [x] 识别 DINAlternate-Bold
 - [ ] 宽高自适应，目前有挤压现象，暂处理为给宽度增加额外长度。
+
 ***
 view功能列表
 - [x] rect
@@ -70,6 +77,7 @@ view功能列表
 imageView功能列表
 - [x] rect
 - [x] 载入图片
+
 ***
 textField功能列表
 - [x] rect
