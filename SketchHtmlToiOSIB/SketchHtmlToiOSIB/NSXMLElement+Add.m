@@ -328,6 +328,14 @@
             [fontDescription m_setValue:@"Helvetica" forKey: @"name"];
             [fontDescription m_setValue:@"Helvetica" forKey: @"family"];
         } else {
+            /*
+             待处理的字
+             PingFangHK-Regular
+             
+             PingFangSC-Light
+             PingFangHK-Medium
+             STHeitiSC-Light
+             */
             NSLog(@"找不到字体：%@", fontStyleName);
         }
     }
