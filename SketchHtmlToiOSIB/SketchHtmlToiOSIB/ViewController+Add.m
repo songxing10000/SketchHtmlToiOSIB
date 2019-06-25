@@ -422,6 +422,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSString *assetsFileName = @"assets";
     NSString *assetsFilePath =
     [htmlFilePath stringByReplacingOccurrencesOfString: @"index.html" withString: assetsFileName];
+    // Spec Export - Sketch Measure 2.3.html
+    if (![htmlFilePath containsString: @"index.html"]) {
+        assetsFilePath =
+        [htmlFilePath stringByReplacingOccurrencesOfString: @".html" withString: @"_files"];
+    }
     BOOL isDir = NO;
     BOOL hasThisFolder =
     [fm fileExistsAtPath: assetsFilePath isDirectory: &isDir] && isDir ;
