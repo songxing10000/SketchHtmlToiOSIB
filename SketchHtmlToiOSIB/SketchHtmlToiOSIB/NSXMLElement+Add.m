@@ -315,7 +315,20 @@
         } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
             [fontDescription m_setValue:@"PingFangSC-Semibold" forKey: @"name"];
             [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
-        } else if([fontStyleName isEqualToString: @"DINAlternate-Bold"]) {
+        } else if([fontStyleName isEqualToString: @"PingFangSC-Light"]) {
+            [fontDescription m_setValue:@"PingFangSC-Light" forKey: @"name"];
+            [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
+        } else if([fontStyleName isEqualToString: @"PingFangHK-Regular"]) {
+            [fontDescription m_setValue:@"PingFangHK-Regular" forKey: @"name"];
+            [fontDescription m_setValue:@"PingFang HK" forKey: @"family"];
+        } else if([fontStyleName isEqualToString: @"PingFangHK-Medium"]) {
+            [fontDescription m_setValue:@"PingFangHK-Medium" forKey: @"name"];
+            [fontDescription m_setValue:@"PingFang HK" forKey: @"family"];
+        } else if([fontStyleName isEqualToString: @"STHeitiSC-Light"]) {
+            [fontDescription m_setValue:@"STHeitiSC-Light" forKey: @"name"];
+            [fontDescription m_setValue:@"STHeiti SC" forKey: @"family"];
+        }
+        else if([fontStyleName isEqualToString: @"DINAlternate-Bold"]) {
             /*
              <fontDescription key="fontDescription" name="DINAlternate-Bold" family="DIN Alternate" pointSize="16"/>
              */
@@ -328,14 +341,7 @@
             [fontDescription m_setValue:@"Helvetica" forKey: @"name"];
             [fontDescription m_setValue:@"Helvetica" forKey: @"family"];
         } else {
-            /*
-             待处理的字
-             PingFangHK-Regular
-             
-             PingFangSC-Light
-             PingFangHK-Medium
-             STHeitiSC-Light
-             */
+
             NSLog(@"找不到字体：%@", fontStyleName);
         }
     }
