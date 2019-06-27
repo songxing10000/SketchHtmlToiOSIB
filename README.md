@@ -1,4 +1,18 @@
 # SketchHtmlToiOSIB
+## 新增功能记录
+
+1、增加子控件嵌套功能：view支持一级、二级嵌套
+
+2、增加按钮识别功能：支持一级按钮、二级按钮合成
+
+3、载入图片功能
+
+4、支持输入框控件
+
+5、修复一些特殊蒙板透明度问题
+
+6、新增识别字体类型（PingFangHK-Regular、PingFangSC-Light、PingFangHK-Medium、STHeitiSC-Light）
+
 ## 如何使用
 1.把美工给的Sketch的网页存至本地，当然有时美工给的就是压缩包，就省去了下载这一步
 
