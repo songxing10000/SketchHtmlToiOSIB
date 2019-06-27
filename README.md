@@ -6,8 +6,10 @@
 
 3.把1中存的网页的html拖入程序面板
 
-4.生成 temp.storyboard 至桌面
+4.生成 temp.xcodeproj 至桌面
+![](show1.png)
 
+![](show2.png)
 
 ![](act.gif)
 
