@@ -304,15 +304,18 @@
          <fontDescription key="fontDescription" name="PingFangSC-Semibold" family="PingFang SC" pointSize="17"/>
          */
         NSXMLElement *fontDescription = [self firstElementByName:@"fontDescription"];
-        if([fontStyleName isEqualToString: @"PingFangSC-Regular"]) {
+        if([fontStyleName isEqualToString: @"PingFangSC-Regular"] ||
+           [fontStyleName isEqualToString: @"PingFang-SC-Regular"]) {
             [fontDescription m_setValue:@"PingFangSC-Regular" forKey:@"name"];
             [fontDescription m_setValue:@"PingFang SC" forKey:@"family"];
             
-        } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"]) {
+        } else if([fontStyleName isEqualToString: @"PingFangSC-Medium"] ||
+                  [fontStyleName isEqualToString: @"PingFang-SC-Medium"]) {
             [fontDescription m_setValue:@"PingFangSC-Medium" forKey: @"name"];
             [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
             
-        } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"]) {
+        } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"] ||
+                  [fontStyleName isEqualToString: @"PingFang-SC-Bold"]) {
             [fontDescription m_setValue:@"PingFangSC-Semibold" forKey: @"name"];
             [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
         } else if([fontStyleName isEqualToString: @"PingFangSC-Light"]) {
