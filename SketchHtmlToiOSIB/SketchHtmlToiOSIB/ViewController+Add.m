@@ -183,11 +183,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-                if (![vc.name isEqualToString: @"iPhone XS"]) {
+//                if (![vc.name isEqualToString: @"B01车源详情"]) {
 //                    NSLog(@"---%@---", vc.name);
-                continue;
+//                continue;
 //
-                }
+//                }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
@@ -578,8 +578,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         BOOL isOnleText = names.count == 1 && [names containsObject: @"label"];
         BOOL isTextAndImg = subEs.count == 2 && [names containsObject: @"label"] &&
         [names containsObject: @"imageView"];
-        if ([rootViewSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
-            
+//        if ([rootViewSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
+        if ([rootViewSubE.name isEqualToString: @"view"] && isTextAndImg) {
+
             NSXMLElement *label;
             if (isOnleText) {
                 label = subEs[0];

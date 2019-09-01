@@ -277,8 +277,14 @@
         gStr = [self getColorValueFromStr: rgba[1]];
         bStr = [self getColorValueFromStr: rgba[2]];
         aStr = rgba[3];
-        if (![rgba[3] isEqualToString: @"1"]) {
-            NSAssert(false, @"这情况得兼容下");
+        if (![aStr isEqualToString: @"1"]) {
+            if ([aStr hasPrefix: @"0."]) {
+                // 0.27
+                
+            } else {
+                
+                NSAssert(false, @"这情况得兼容下");
+            }
         }
         
     } else if ([textColor containsString: key2Str]){
