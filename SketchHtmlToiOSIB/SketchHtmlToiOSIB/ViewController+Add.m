@@ -201,8 +201,16 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             /// 将要被添加的新的 view NSXMLElement 对象
             NSXMLElement *aNewWillBeAddedViewElement = nil;
             if ([viewType isEqualToString:@"text"]) {
-                if ([view.content hasPrefix: @"请输入"] ||
-                    [view.content hasPrefix: @"请填写"]) {
+                /// ffffff 这种颜色的label不可能是输入框
+                NSString *textColor = @"";
+                if(view.fills.count > 0) {
+                    textColor = view.fills[0].color.uiColor ;
+                } else if (view.css.count > 2) {
+                    textColor = view.css[2];
+                }
+                
+                if (([view.content hasPrefix: @"请输入"] ||
+                    [view.content hasPrefix: @"请填写"]) && ![textColor containsString:@"FFFFFF"]) {
 #pragma mark - UITextFiled
                     // 输入框
                     NSXMLElement *textFiledElement = [self getNewTextFiledElement];
