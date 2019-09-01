@@ -624,7 +624,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             BOOL isOnleText = names2.count == 1 && [names2 containsObject: @"label"];
             BOOL isTextAndImg = subEs2.count == 2 && [names2 containsObject: @"label"] &&
             [names2 containsObject: @"imageView"];
-            if ([rootViewSubSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
+            //             if ([rootViewSubSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
+            /// 只有文字时，先不转换成按钮
+            if ([rootViewSubSubE.name isEqualToString: @"view"] && isTextAndImg) {
                 
                 NSXMLElement *label;
                 if (isOnleText) {
