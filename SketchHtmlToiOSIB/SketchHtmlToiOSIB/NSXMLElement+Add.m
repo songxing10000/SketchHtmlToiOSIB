@@ -261,29 +261,56 @@
     }
     NSXMLElement *rectElement = desElement;
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
-    NSString *color = [textColor stringByReplacingOccurrencesOfString:@"(r:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@".00)" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"r:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"g:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"b:" withString:@""];
-    color = [color stringByReplacingOccurrencesOfString:@"a:" withString:@""];
-    NSArray<NSString *> *rgba = [color componentsSeparatedByString:@" "];
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"red"]) {
-            [node setStringValue: rgba[0]];
-        }else if ([node.name isEqualToString: @"green"]) {
-            [node setStringValue: rgba[1]];
-        } else if ([node.name isEqualToString: @"blue"]) {
-            [node setStringValue: rgba[2]];
-        } else if ([node.name isEqualToString: @"alpha"]) {
-            NSString *alphaStr = [rgba[3] stringByReplacingOccurrencesOfString: @")" withString:@""];
-            if ( alphaStr.length == 0 ) {
-                // 修复可能出错的情况
-                alphaStr = @"1";
-            }
-            [node setStringValue: alphaStr];
+    NSString *rStr = nil;
+    NSString *gStr = nil;
+    NSString *bStr = nil;
+    NSString *aStr = nil;
+    
+    NSString *key1Str = @"rgba(";
+    NSString *key2Str = @"(r:";
+    if ([textColor containsString: key1Str]) {
+        // 这种情况 rgba(34,34,34,1)
+        NSString *color = [textColor stringByReplacingOccurrencesOfString: key1Str withString:@""];
+        color = [color stringByReplacingOccurrencesOfString: @")" withString:@""];
+        NSArray<NSString *> *rgba = [color componentsSeparatedByString: @","];
+        rStr = [self getColorValueFromStr: rgba[0]];
+        gStr = [self getColorValueFromStr: rgba[1]];
+        bStr = [self getColorValueFromStr: rgba[2]];
+        aStr = rgba[3];
+        if (![rgba[3] isEqualToString: @"1"]) {
+            NSAssert(false, @"这情况得兼容下");
         }
         
+    } else if ([textColor containsString: key2Str]){
+        // 这种情况 (r:0.13 g:0.13 b:0.13 a:1.00)
+        NSString *color = [textColor stringByReplacingOccurrencesOfString:@"(r:" withString:@""];
+        color = [color stringByReplacingOccurrencesOfString:@".00)" withString:@""];
+        color = [color stringByReplacingOccurrencesOfString:@"r:" withString:@""];
+        color = [color stringByReplacingOccurrencesOfString:@"g:" withString:@""];
+        color = [color stringByReplacingOccurrencesOfString:@"b:" withString:@""];
+        color = [color stringByReplacingOccurrencesOfString:@"a:" withString:@""];
+        NSArray<NSString *> *rgba = [color componentsSeparatedByString:@" "];
+        rStr = rgba[0];
+        gStr = rgba[1];
+        bStr = rgba[2];
+        aStr = [rgba[3] stringByReplacingOccurrencesOfString: @")" withString:@""];
+        if ( aStr.length == 0 ) {
+            // 修复可能出错的情况
+            aStr = @"1";
+        }
+    }
+    
+    
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: @"red"]) {
+            [node setStringValue: rStr];
+        }else if ([node.name isEqualToString: @"green"]) {
+            [node setStringValue: gStr];
+        } else if ([node.name isEqualToString: @"blue"]) {
+            [node setStringValue: bStr];
+        } else if ([node.name isEqualToString: @"alpha"]) {
+            [node setStringValue: aStr];
+        }
     }
 }
 -(NSString *)fontStyle {
@@ -349,4 +376,12 @@
         }
     }
 }
+    /// 34 转换成 34/255
+    -(NSString*)getColorValueFromStr:(NSString *)input{
+        if (![input containsString: @"."]) {
+            // 整数
+            return [NSString stringWithFormat:@"%.17f", [input intValue] / 255.0];
+        }
+        return  @"ff";
+    }
 @end

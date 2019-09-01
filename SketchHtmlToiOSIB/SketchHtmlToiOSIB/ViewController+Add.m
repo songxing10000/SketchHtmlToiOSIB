@@ -183,11 +183,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self.hud show:YES];
     for (ArtboardsItem *vc in object.artboards) {
         /// 调试某个特定页面可这样写
-//                if (![vc.name isEqualToString: @"编辑员工信息"]) {
+                if (![vc.name isEqualToString: @"iPhone XS"]) {
 //                    NSLog(@"---%@---", vc.name);
-//                continue;
+                continue;
 //
-//                }
+                }
         NSXMLElement *vcElement = [self getNewVCElement];
         NSArray <SKLayer *> *views = vc.layers;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
@@ -245,7 +245,16 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 }
                 NSXMLElement *viewElement = [self getNewViewElement];
                 if (view.fills && view.fills.count > 0) {
-                    viewElement.backgroundColor = view.fills[0].color.uiColor ;
+                    // 事实证明这里取uiColor不太准确，尝试取 cssRgba, 如果有的话
+                    if (view.fills[0].color.cssRgba.length > 0) {
+                        
+                        viewElement.backgroundColor = view.fills[0].color.cssRgba ;
+
+                    } else {
+                        
+                        viewElement.backgroundColor = view.fills[0].color.uiColor ;
+
+                    }
                 }
                 if (view.css && view.css.count > 0) {
                     [self setViewCss:view.css ForElement:viewElement];
