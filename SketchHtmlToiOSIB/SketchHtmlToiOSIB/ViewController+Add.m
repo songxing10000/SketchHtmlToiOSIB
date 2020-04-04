@@ -100,12 +100,15 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
     NSString *rightHtmlFilePath = htmlFilePath.mutableCopy;
     if (!isDir) {
-        
-        if (![[htmlFilePath pathExtension] isEqualToString:@"html"]) {
-            NSLog(@"应该传入html文件");
-            return nil;
+        // 蓝湖的是 类似这种的，  *- 蓝湖.htm
+        BOOL isLH = [htmlFilePath hasSuffix: @"蓝湖.htm"];
+        if (!isLH) {
+            if (![[htmlFilePath pathExtension] isEqualToString:@"html"] ||
+                ![[htmlFilePath pathExtension] isEqualToString:@"htm"]) {
+                NSLog(@"应该传入html文件");
+                return nil;
+            }
         }
-        
     } else {
         /// 尝试查找传入文件夹内的 index.html
         // 获得当前文件夹path下面的所有内容（文件夹、文件）
@@ -133,20 +136,50 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         return nil;
     }
     NSString *text = [NSString stringWithContentsOfFile:rightHtmlFilePath encoding:NSUTF8StringEncoding error:nil];
-    NSString *startStr = @"SMApp(";
+    BOOL isLH = [text containsString: @"https://lanhuapp.com"];
+    NSString *startStr = isLH ? @"\"visible\": [" : @"SMApp(";
     NSUInteger start = [text rangeOfString: startStr].location;
+    NSUInteger startLen = [text rangeOfString: startStr].length;
+
     if (start == NSNotFound) {
+        if (isLH) {
+            // 解析到的是蓝湖
+            
+        } else {
+            NSLog(@"未找到标准的数据");
+            return nil;
+        }
+    }
+    if (startLen <= 0) {
         NSLog(@"未找到标准的数据");
-        return nil;
+        return  nil;
     }
     start += startStr.length;
-    NSString *endStr = @") });";
+    NSString *endStr = isLH ? @"</span> <div data" : @") });";
     NSUInteger end = [text rangeOfString: endStr options:(NSLiteralSearch|NSBackwardsSearch) range:NSMakeRange(start, text.length - start)].location;
     if (end == NSNotFound) {
         NSLog(@"结束标志");
         return nil;
     }
     NSString *subString = [text substringWithRange:NSMakeRange(start, end - start)];
+    // 针对蓝湖
+    // 首部加上 [
+    // 尾部去除
+    /*
+     ,
+       "isAsset": false,
+       "isSlice": false,
+       "web_id": 1,
+       "multiple_checked": false,
+       "skip_select": false
+     }
+     */
+    if (isLH) {
+        subString = [subString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        subString = [subString stringByReplacingOccurrencesOfString:@" " withString:@""];
+        subString = [subString stringByReplacingOccurrencesOfString:@",\"isAsset\":false,\"isSlice\":false,\"web_id\":1,\"multiple_checked\":false,\"skip_select\":false}" withString:@""];
+        subString = [NSString stringWithFormat: @"[%@", subString];
+    }
     return subString ;
 }
 
