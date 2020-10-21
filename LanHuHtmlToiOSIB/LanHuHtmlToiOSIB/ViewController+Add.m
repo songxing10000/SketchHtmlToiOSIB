@@ -137,7 +137,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
     NSString *text = [NSString stringWithContentsOfFile:rightHtmlFilePath encoding:NSUTF8StringEncoding error:nil];
     BOOL isLH = [text containsString: @"https://lanhuapp.com"];
-    NSString *startStr = isLH ? @"\"visible\": [" : @"SMApp(";
+    NSString *startStr = isLH ? @"\">{" : @"SMApp(";
     NSUInteger start = [text rangeOfString: startStr].location;
     NSUInteger startLen = [text rangeOfString: startStr].length;
 
@@ -155,7 +155,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         return  nil;
     }
     start += startStr.length;
-    NSString *endStr = isLH ? @"</span> <div data" : @") });";
+    // }</span> <div
+    NSString *endStr = isLH ? @"}</span> <div data" : @") });";
     NSUInteger end = [text rangeOfString: endStr options:(NSLiteralSearch|NSBackwardsSearch) range:NSMakeRange(start, text.length - start)].location;
     if (end == NSNotFound) {
         NSLog(@"结束标志");
@@ -177,11 +178,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     if (isLH) {
         subString = [subString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
         subString = [subString stringByReplacingOccurrencesOfString:@" " withString:@""];
-        subString = [subString stringByReplacingOccurrencesOfString:@",\"isAsset\":false,\"isSlice\":false,\"web_id\":1,\"multiple_checked\":false,\"skip_select\":false}" withString:@""];
-        
-        // fix 有些蓝湖网页源码上，没有 skip_select:false
-        subString = [subString stringByReplacingOccurrencesOfString:@",\"isAsset\":false,\"isSlice\":false,\"web_id\":1,\"multiple_checked\":false}" withString:@""];
-        subString = [NSString stringWithFormat: @"[%@", subString];
+        subString = [NSString stringWithFormat: @"{%@}", subString];
     }
     return subString ;
 }

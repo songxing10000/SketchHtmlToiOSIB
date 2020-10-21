@@ -17,7 +17,7 @@
              @"uiColor": @"ui-color",
              
              
-             };
+    };
 }
 @end
 
@@ -27,7 +27,7 @@
     return @{@"borders" : [SKBorder class],
              @"fills" : [SKFill class],
              @"shadows": [SKShadow class]
-             };
+    };
 }
 @end
 
@@ -39,7 +39,7 @@
 @implementation ArtboardsItem
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"layers" : [SKLayer class]
-             };
+    };
 }
 @end
 
@@ -53,7 +53,7 @@
 @implementation SlicesItem
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"exportable" : [ExportableItem class]
-             };
+    };
 }
 
 
@@ -69,7 +69,70 @@
     return @{@"artboards" : [ArtboardsItem class],
              @"slices" : [SlicesItem class],
              @"colors" : [ColorsItem class],
-             };
+             @"visible": [VisibleItem class]
+    };
+}
+@end
+#pragma mark - 蓝湖
+@implementation Protection
+@end
+@implementation _orgBounds
+@end
+@implementation VisibleItem
++ (NSDictionary *)modelContainerPropertyGenericClass {
+    return @{
+        @"layers": [VisibleItem class]
+    };
 }
 
+
+@end
+@implementation BlendOptions
+@end
+@implementation LHImage
+@end
+
+@implementation Color
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"red": @"r",
+             @"green" : @"g",
+             @"blue": @"b"
+    };
+}
+@end 
+
+
+@implementation TextStyle
+@end
+
+
+@implementation TextStyleRangeItem
+@end
+
+
+@implementation Bounds
+@end
+
+
+@implementation BoundingBox
+@end
+
+
+@implementation Transform
+@end
+
+
+@implementation Base
+@end
+
+
+@implementation TextShapeItem
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"m_char": @"char"};
+}
+
+@end
+
+
+@implementation TextInfo
 @end

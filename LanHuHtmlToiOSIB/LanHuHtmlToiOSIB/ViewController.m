@@ -29,6 +29,21 @@
     NSString *htmlFilePath = items[0];
     NSString *jsonStr = [self jsonStrWithHtmlFileAtPath:htmlFilePath];
     NBSKObject *skObj = [NBSKObject objWithJSON:jsonStr];
+    
+    NSLog(@"---%@---",[skObj.visible valueForKeyPath:@"type"]);
+    for (VisibleItem *item1 in skObj.visible) {
+        for (VisibleItem *item2 in item1.layers) {
+            NSLog(@"---%@---",[item2.layers valueForKeyPath:@"type"]);
+            for (VisibleItem *item3 in item2.layers) {
+                NSLog(@"---%@---",[item3.layers valueForKeyPath:@"type"]);
+                
+                for (VisibleItem *item4 in item3.layers) {
+                    NSLog(@"---%@---",[item4.layers valueForKeyPath:@"type"]);
+                }
+            }
+        }
+    }
+    
     NSString *storyboardDestPath = [[self desktopFolderFilePath] stringByAppendingPathComponent:@"temp.storyboard"];
     [self createSBFileAtPath:storyboardDestPath withObj:skObj htmlFilePath: htmlFilePath];
 }
