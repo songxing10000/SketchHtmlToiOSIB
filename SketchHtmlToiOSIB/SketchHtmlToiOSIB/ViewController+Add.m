@@ -178,6 +178,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         subString = [subString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
         subString = [subString stringByReplacingOccurrencesOfString:@" " withString:@""];
         subString = [subString stringByReplacingOccurrencesOfString:@",\"isAsset\":false,\"isSlice\":false,\"web_id\":1,\"multiple_checked\":false,\"skip_select\":false}" withString:@""];
+        
+        // fix 有些蓝湖网页源码上，没有 skip_select:false
+        subString = [subString stringByReplacingOccurrencesOfString:@",\"isAsset\":false,\"isSlice\":false,\"web_id\":1,\"multiple_checked\":false}" withString:@""];
         subString = [NSString stringWithFormat: @"[%@", subString];
     }
     return subString ;
