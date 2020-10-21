@@ -1,0 +1,20 @@
+PODS:
+  - MBProgressHUD-OSX (0.0.1)
+  - YYModel (1.0.4)
+
+DEPENDENCIES:
+  - MBProgressHUD-OSX (~> 0.0.1)
+  - YYModel (~> 1.0.4)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - MBProgressHUD-OSX
+    - YYModel
+
+SPEC CHECKSUMS:
+  MBProgressHUD-OSX: 7d2dc7973de678785c3b75b8573d776f08a4bb64
+  YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
+
+PODFILE CHECKSUM: 4431e99c4329bcae6c2877d31e864cb94df60b95
+
+COCOAPODS: 1.5.3

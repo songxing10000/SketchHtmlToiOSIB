@@ -1,0 +1,7 @@
+<label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="zzzzzz" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VDc-z2-cR3">
+    <rect key="frame" x="145" y="44" width="56" height="22"/>
+    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+    <fontDescription key="fontDescription" pointSize="18"/>
+    <color key="textColor" red="0.260517418384552" green="0.26052439212799072" blue="0.26052063703536987" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+    <nil key="highlightedColor"/>
+</label>

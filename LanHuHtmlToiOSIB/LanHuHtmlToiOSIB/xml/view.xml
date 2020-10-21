@@ -1,0 +1,7 @@
+<view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="THK-ng-9O9">
+    <rect key="frame" x="42" y="120" width="240" height="128"/>
+    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+    <subviews>
+    </subviews>
+    <color key="backgroundColor" red="0.97921922929447858" green="0.98572565184049077" blue="0.97849166027607359" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+</view>

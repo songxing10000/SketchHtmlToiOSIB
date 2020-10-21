@@ -1,0 +1,4 @@
+<imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES"  translatesAutoresizingMaskIntoConstraints="NO" id="ums-7e-YWy">
+    <rect key="frame" x="175" y="352" width="126" height="102"/>
+    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+</imageView>
