@@ -67,29 +67,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 }
 
 @implementation ViewController (Add)
-#pragma mark - read save xml
 
-- (NSXMLElement *)rootElementWithXmlFileName:(NSString *)xmlFileName {
-    return (NSXMLElement *)[self documentWithXmlFileName:xmlFileName].rootElement;
-}
-- (NSXMLDocument *)documentWithXmlFileName:(NSString *)xmlFileName {
-    
-    NSError *error = nil;
-    
-    NSString *xmlFilePath = [[NSBundle mainBundle] pathForResource:xmlFileName
-                                                            ofType:@"xml"];
-    if (!xmlFilePath) {
-        NSLog(@"找不到xml文件%@", xmlFileName);
-        return [NSXMLDocument document];
-    }
-    NSData *xmlData = [NSData dataWithContentsOfFile:xmlFilePath options: 0 error: &error];
-    if (error) {
-        NSLog(@"error = %@",error);
-        return [NSXMLDocument document];
-    }
-    NSXMLDocument *xmlDocument = [[NSXMLDocument alloc] initWithData:xmlData options:NSXMLNodePreserveWhitespace error:&error];
-    return xmlDocument;
-}
 - (NSString *)getHtmlFilePathFromPath:(NSString *)htmlFilePath {
     BOOL isDir = NO;
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -183,93 +161,22 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     return subString ;
 }
 
-/**
- 忽略某个view不加入到页面上
- 
- @param view 要判断的view
- */
-- (BOOL)canIgnoreView:(VisibleItem *)view {
-    if (!view.visible) {
-        return YES;
-    }
-    return NO;
-}
 - (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath {
     if (!sbDesPath || !object) {
         return;
     }
-    NSXMLDocument *sbDocument = [self documentWithXmlFileName:@"sb"];
+    NSXMLDocument *sbDocument = [NSXMLElement documentWithXmlFileName:@"sb"];
     
     NSXMLElement *scenes =
     [sbDocument.rootElement firstElementByName:@"scenes"];
     
-    NSXMLElement *vcElement = [self getNewVCElement];
+    NSXMLElement *vcElement = [NSXMLElement getNewVCElement];
     NSArray <VisibleItem *> *views = object.visible;
+    // 如果有可能加长页面
     [self changeVCSizeForVCElement:vcElement vcViews:views];
     for (VisibleItem *view in views) {
-        if ([self canIgnoreView:view]) {
-            continue;
-        }
         
-        /// 控件类别 text为lable， slice为图片，shape为view
-        NSString *viewType = view.type;
-        /// 将要被添加的新的 view NSXMLElement 对象
-        NSXMLElement *aNewWillBeAddedViewElement = nil;
-        if ([viewType isEqualToString:@"textLayer"] || view.text) {
-            
-            
-            if (([view.textInfo.text hasPrefix: @"请输入"] ||
-                 [view.textInfo.text hasPrefix: @"请填写"]) ) {
-#pragma mark - UITextFiled
-                // 输入框
-                NSXMLElement *textFiledElement = [self getNewTextFiledElement];
-                // placeholder
-                [textFiledElement m_setValue: view.textInfo.text forKey: @"placeholder"];
-                
-                textFiledElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
-                textFiledElement.fontStyle = view.textInfo.fontPostScriptName;
-                // placeholder 颜色xml内置
-                // 正常情况下的文字颜色 xml内置
-                
-                //                    textFiledElement.textColor =
-                //                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
-                aNewWillBeAddedViewElement = textFiledElement;
-            } else {
-#pragma mark - UILabel
-                
-                // 文本
-                NSXMLElement *labelElement = [self getNewlabelElement];
-                labelElement.text = view.textInfo.text;
-                labelElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
-                labelElement.fontStyle = view.textInfo.fontPostScriptName;
-                
-                labelElement.textColor =
-                [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.textInfo.color.red/255.0, view.textInfo.color.green/255.0, view.textInfo.color.blue/255.0];
-                aNewWillBeAddedViewElement = labelElement;
-            }
-        }
-        else if (view.isAsset) {
-            //图片
-#pragma mark - UIImageView
-            NSXMLElement *imgElement = [self getNewImageViewElementWithImgName: view.name];
-            aNewWillBeAddedViewElement = imgElement;
-        }
-        else if ([viewType isEqualToString:@"layerSection"]) {
-#pragma mark - UIView
-            NSXMLElement *viewElement = [self getNewViewElement];
-            aNewWillBeAddedViewElement = viewElement;
-        }
-        else {
-            
-            NSLog(@"--未知类型控件--%@---", viewType);
-        }
-        _orgBounds *rightF = [_orgBounds new];
-        rightF.top = view.bounds.top * 0.5;
-        rightF.left = view.bounds.left * 0.5;
-        rightF.bottom = view.bounds.bottom * 0.5;
-        rightF.right = view.bounds.right * 0.5;
-        
-        aNewWillBeAddedViewElement.skRect = rightF;
+        NSXMLElement *aNewWillBeAddedViewElement = [NSXMLElement elementWithItem:view];
         
         if (!aNewWillBeAddedViewElement) {
             continue;
@@ -572,7 +479,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 label = subEs[[names indexOfObject: @"label"]];
             }
             // view 包含一个  label
-            NSXMLElement *button = [self getNewButtonElement];
+            NSXMLElement *button = [NSXMLElement getNewButtonElement];
             if (rootViewSubE.skRect.top < 0) {
                 rootViewSubE.skRect.top = 0;
             }
@@ -620,7 +527,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                     label = subEs2[[names2 indexOfObject: @"label"]];
                 }
                 // view 包含一个  label
-                NSXMLElement *button = [self getNewButtonElement];
+                NSXMLElement *button = [NSXMLElement getNewButtonElement];
                 // 更新button frame
                 button.skRect = rootViewSubSubE.skRect;
                 // 更新 bgColor
@@ -802,61 +709,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
 }
 #pragma mark - 从xml文件加载出 NSXMLElement 对象
-- (NSXMLElement *)getNewVCElement {
-    NSXMLElement *vcElement = [self rootElementWithXmlFileName:@"vc"];
-    [self setRandomIdForElement:vcElement];
-    NSXMLElement *objects = [vcElement firstElementByName:@"objects"];
-    NSXMLElement *placeholder = [objects firstElementByName:@"placeholder"];
-    [self setRandomIdForElement:placeholder];
-    
-    NSXMLElement *viewController = [objects firstElementByName:@"viewController"];
-    [self setRandomIdForElement:viewController];
-    
-    
-    NSXMLElement *view = [viewController firstElementByName:@"view" ];
-    [self setRandomIdForElement:view];
-    NSXMLElement *viewLayoutGuide = [view firstElementByName:@"viewLayoutGuide" ];
-    [self setRandomIdForElement:viewLayoutGuide];
-    
-    return vcElement.copy;
-}
-- (NSXMLElement *)getNewTextFiledElement {
-    NSXMLElement *textFiledElement = [self rootElementWithXmlFileName:@"textField"];
-    [self setRandomIdForElement:textFiledElement];
-    return textFiledElement.copy;
-}
-- (NSXMLElement *)getNewlabelElement {
-    NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"label"];
-    [self setRandomIdForElement:lableElement];
-    return lableElement.copy;
-}
-- (NSXMLElement *)getNewButtonElement {
-    NSXMLElement *lableElement = [self rootElementWithXmlFileName:@"button"];
-    [self setRandomIdForElement:lableElement];
-    return lableElement.copy;
-}
-/// name imageView"
-- (NSXMLElement *)getNewImageViewElementWithImgName:(NSString *)imgName {
-    NSXMLElement *imgVElement = [self rootElementWithXmlFileName:@"imageView"];
-    [imgVElement m_setValue: imgName forKey: @"image"];
-    [self setRandomIdForElement:imgVElement];
-    return imgVElement.copy;
-}
-- (NSXMLElement *)getNewViewElement {
-    NSXMLElement *viewElement = [self rootElementWithXmlFileName:@"view"];
-    [self setRandomIdForElement:viewElement];
-    return viewElement.copy;
-}
+
 #pragma mark - 对 NSXMLElement 对象设置相关属性
-- (void)setRandomIdForElement:(NSXMLElement *)element {
-    NSArray<NSXMLNode *> *nodes = element.attributes;
-    NSString *name = [element.name isEqualToString:@"scene"]?@"sceneID":@"id";
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: name]) {
-            [node setStringValue:[NSString randomid]];
-        }
-    }
-}
+
 
 -(void)setNormalText:(NSString *)text forButtonElement:(NSXMLElement *)element {
     if (![element.name isEqualToString: @"button"]) {
@@ -917,7 +772,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     CGRectMake(desSR.left, desSR.top, desSR.right-desSR.left, desSR.bottom-desSR.top);
     return rect;
 }
-
+/// 如页面太长，改变页面长度
 - (void)changeVCSizeForVCElement:(NSXMLElement *)vcElement vcViews:(NSArray <VisibleItem *> *)views {
     /// 设计稿 375*667
     CGFloat screenH = 667;

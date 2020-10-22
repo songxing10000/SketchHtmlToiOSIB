@@ -7,7 +7,7 @@
 //
 
 #import "NSXMLElement+Add.h"
-
+#import "NSString+Add.h"
 @implementation NSXMLElement (Add)
 -(CGRect)cgRect {
     _orgBounds *skRect = self.skRect;
@@ -391,5 +391,150 @@
         return [NSString stringWithFormat:@"%.17f", [input intValue] / 255.0];
     }
     return  @"ff";
+}
+
++ (nullable NSXMLElement *)elementWithItem:(nonnull VisibleItem *)view {
+    if (!view.visible) {
+        return nil;
+    }
+    /// 控件类别 text为lable， slice为图片，shape为view
+    NSString *viewType = view.type;
+    /// 将要被添加的新的 view NSXMLElement 对象
+    NSXMLElement *aNewWillBeAddedViewElement = nil;
+    if (view.text) {
+        
+        
+        if (([view.textInfo.text hasPrefix: @"请输入"] ||
+             [view.textInfo.text hasPrefix: @"请填写"]) ) {
+#pragma mark - UITextFiled
+            // 输入框
+            NSXMLElement *textFiledElement = [self getNewTextFiledElement];
+            // placeholder
+            [textFiledElement m_setValue: view.textInfo.text forKey: @"placeholder"];
+            
+            textFiledElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
+            textFiledElement.fontStyle = view.textInfo.fontPostScriptName;
+            // placeholder 颜色xml内置
+            // 正常情况下的文字颜色 xml内置
+            
+            //                    textFiledElement.textColor =
+            //                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
+            aNewWillBeAddedViewElement = textFiledElement;
+        } else {
+#pragma mark - UILabel
+            
+            // 文本
+            NSXMLElement *labelElement = [self getNewlabelElement];
+            labelElement.text = view.textInfo.text;
+            labelElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
+            labelElement.fontStyle = view.textInfo.fontPostScriptName;
+            
+            labelElement.textColor =
+            [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.textInfo.color.red/255.0, view.textInfo.color.green/255.0, view.textInfo.color.blue/255.0];
+            aNewWillBeAddedViewElement = labelElement;
+        }
+    }
+    else if (view.isAsset) {
+        //图片
+#pragma mark - UIImageView
+        NSXMLElement *imgElement = [self getNewImageViewElementWithImgName: view.name];
+        aNewWillBeAddedViewElement = imgElement;
+    }
+    else if ([viewType isEqualToString:@"layerSection"]) {
+#pragma mark - UIView
+        NSXMLElement *viewElement = [self getNewViewElement];
+        aNewWillBeAddedViewElement = viewElement;
+    }
+    else {
+        
+        NSLog(@"--未知类型控件--%@---", viewType);
+    }
+    _orgBounds *rightF = [_orgBounds new];
+    rightF.top = view.bounds.top * 0.5;
+    rightF.left = view.bounds.left * 0.5;
+    rightF.bottom = view.bounds.bottom * 0.5;
+    rightF.right = view.bounds.right * 0.5;
+    
+    aNewWillBeAddedViewElement.skRect = rightF;
+    
+    return  aNewWillBeAddedViewElement;
+}
++ (void)setRandomIdForElement:(NSXMLElement *)element {
+    NSArray<NSXMLNode *> *nodes = element.attributes;
+    NSString *name = [element.name isEqualToString:@"scene"]?@"sceneID":@"id";
+    for (NSXMLNode *node in nodes) {
+        if ([node.name isEqualToString: name]) {
+            [node setStringValue:[NSString randomid]];
+        }
+    }
+}
+
++ (NSXMLElement *)rootElementWithXmlFileName:(NSString *)xmlFileName {
+    return (NSXMLElement *)[self documentWithXmlFileName:xmlFileName].rootElement;
+}
++ (NSXMLDocument *)documentWithXmlFileName:(NSString *)xmlFileName {
+    
+    NSError *error = nil;
+    
+    NSString *xmlFilePath = [[NSBundle mainBundle] pathForResource:xmlFileName
+                                                            ofType:@"xml"];
+    if (!xmlFilePath) {
+        NSLog(@"找不到xml文件%@", xmlFileName);
+        return [NSXMLDocument document];
+    }
+    NSData *xmlData = [NSData dataWithContentsOfFile:xmlFilePath options: 0 error: &error];
+    if (error) {
+        NSLog(@"error = %@",error);
+        return [NSXMLDocument document];
+    }
+    NSXMLDocument *xmlDocument = [[NSXMLDocument alloc] initWithData:xmlData options:NSXMLNodePreserveWhitespace error:&error];
+    return xmlDocument;
+}
+
+
++ (NSXMLElement *)getNewVCElement {
+    NSXMLElement *vcElement = [NSXMLElement rootElementWithXmlFileName:@"vc"];
+    [NSXMLElement setRandomIdForElement:vcElement];
+    NSXMLElement *objects = [vcElement firstElementByName:@"objects"];
+    NSXMLElement *placeholder = [objects firstElementByName:@"placeholder"];
+    [NSXMLElement setRandomIdForElement:placeholder];
+    
+    NSXMLElement *viewController = [objects firstElementByName:@"viewController"];
+    [NSXMLElement setRandomIdForElement:viewController];
+    
+    
+    NSXMLElement *view = [viewController firstElementByName:@"view" ];
+    [NSXMLElement setRandomIdForElement:view];
+    NSXMLElement *viewLayoutGuide = [view firstElementByName:@"viewLayoutGuide" ];
+    [NSXMLElement setRandomIdForElement:viewLayoutGuide];
+    
+    return vcElement.copy;
+}
++ (NSXMLElement *)getNewTextFiledElement {
+    NSXMLElement *textFiledElement = [NSXMLElement rootElementWithXmlFileName:@"textField"];
+    [NSXMLElement setRandomIdForElement:textFiledElement];
+    return textFiledElement.copy;
+}
++ (NSXMLElement *)getNewlabelElement {
+    NSXMLElement *lableElement = [NSXMLElement rootElementWithXmlFileName:@"label"];
+    [NSXMLElement setRandomIdForElement:lableElement];
+    return lableElement.copy;
+}
++ (NSXMLElement *)getNewButtonElement {
+    NSXMLElement *lableElement = [NSXMLElement rootElementWithXmlFileName:@"button"];
+    [NSXMLElement setRandomIdForElement:lableElement];
+    return lableElement.copy;
+}
+/// name imageView"
++ (NSXMLElement *)getNewImageViewElementWithImgName:(NSString *)imgName {
+    NSXMLElement *imgVElement = [NSXMLElement rootElementWithXmlFileName:@"imageView"];
+    [imgVElement m_setValue: imgName forKey: @"image"];
+    [NSXMLElement setRandomIdForElement:imgVElement];
+    return imgVElement.copy;
+}
++ (NSXMLElement *)getNewViewElement {
+    NSXMLElement *viewElement = [NSXMLElement rootElementWithXmlFileName:@"view"];
+    [NSXMLElement setRandomIdForElement:viewElement];
+    return viewElement.copy;
 }
 @end

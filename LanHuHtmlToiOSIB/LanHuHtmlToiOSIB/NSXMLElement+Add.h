@@ -9,7 +9,11 @@
 
 #import <Foundation/Foundation.h>
 #import "NBSKObject.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSXMLElement (Add)
++ (nullable NSXMLElement *)elementWithItem:(nonnull VisibleItem *)item;
 
 /// label view button
 @property(nonatomic, copy) NSString *backgroundColor;
@@ -29,5 +33,24 @@
 - (NSXMLElement *)firstElementByName:(NSString *)elementName;
 - (NSString *)m_getValueForKey:(NSString *)key;
 - (void)m_setValue:(NSString *)value forKey:(NSString *)key;
+
+
++ (void)setRandomIdForElement:(NSXMLElement *)element;
++ (NSXMLElement *)rootElementWithXmlFileName:(NSString *)xmlFileName;
++ (NSXMLDocument *)documentWithXmlFileName:(NSString *)xmlFileName;
+
+
+
+
++ (NSXMLElement *)getNewVCElement;
++ (NSXMLElement *)getNewTextFiledElement;
++ (NSXMLElement *)getNewlabelElement;
++ (NSXMLElement *)getNewButtonElement;
++ (NSXMLElement *)getNewImageViewElementWithImgName:(NSString *)imgName;
++ (NSXMLElement *)getNewViewElement;
+
 @end
+
+
+NS_ASSUME_NONNULL_END
 
