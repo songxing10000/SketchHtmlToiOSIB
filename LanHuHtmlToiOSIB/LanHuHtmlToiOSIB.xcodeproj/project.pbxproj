@@ -68,6 +68,7 @@
 		981D4E2521CE575C00B16508 /* NBSKObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBSKObject.h; sourceTree = "<group>"; };
 		981D4E2D21CE719000B16508 /* ViewController+Add.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ViewController+Add.h"; sourceTree = "<group>"; };
 		981D4E2E21CE719000B16508 /* ViewController+Add.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ViewController+Add.m"; sourceTree = "<group>"; };
+		98DF63B125417AC800FC0513 /* LanHuHtmlToiOSIB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LanHuHtmlToiOSIB.entitlements; sourceTree = "<group>"; };
 		B2384C27C4335DDC8345C4A8 /* Pods-SketchHtmlToiOSIB.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SketchHtmlToiOSIB.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SketchHtmlToiOSIB/Pods-SketchHtmlToiOSIB.debug.xcconfig"; sourceTree = "<group>"; };
 		E364D36D459E3B8570E3B3AB /* Pods-SketchHtmlToiOSIB.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SketchHtmlToiOSIB.release.xcconfig"; path = "Pods/Target Support Files/Pods-SketchHtmlToiOSIB/Pods-SketchHtmlToiOSIB.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,6 +168,7 @@
 		9815BDC021CD47E10048AD13 /* LanHuHtmlToiOSIB */ = {
 			isa = PBXGroup;
 			children = (
+				98DF63B125417AC800FC0513 /* LanHuHtmlToiOSIB.entitlements */,
 				041C6D0721CF565600F7A999 /* view */,
 				980BF50B21CF03C00035FF08 /* model */,
 				980BF4FE21CF03670035FF08 /* xml */,
@@ -444,6 +446,7 @@
 			baseConfigurationReference = 61011FE1F8655BACA86BF938 /* Pods-LanHuHtmlToiOSIB.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LanHuHtmlToiOSIB/LanHuHtmlToiOSIB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/LanHuHtmlToiOSIB/Info.plist";
@@ -461,6 +464,7 @@
 			baseConfigurationReference = 47DE0999FFFFF6EFD716BB92 /* Pods-LanHuHtmlToiOSIB.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LanHuHtmlToiOSIB/LanHuHtmlToiOSIB.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/LanHuHtmlToiOSIB/Info.plist";

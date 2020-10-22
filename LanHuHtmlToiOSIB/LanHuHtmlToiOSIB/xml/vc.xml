@@ -7,7 +7,7 @@
                 <subviews>
                     
                 </subviews>
-                <color key="backgroundColor" red="0.99215686274509807" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                <color key="backgroundColor" red="0.96078431372549022" green="0.97647058823529409" blue="0.9882352941176471" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
             </view>
         </viewController>
