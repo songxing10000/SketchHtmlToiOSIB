@@ -8,49 +8,36 @@
 
 #import "NSXMLElement+Add.h"
 #import "NSString+Add.h"
+#import <objc/runtime.h>
 @implementation NSXMLElement (Add)
-
--(_orgBounds *)skRect {
-    _orgBounds *rect = [_orgBounds new];
-    NSXMLElement *rectElement = [self firstElementByName:@"rect"];
-    NSArray<NSXMLNode *> *nodes = rectElement.attributes;
-    for (NSXMLNode *node in nodes) {
-        if ([node.name isEqualToString: @"x"]) {
-            
-            rect.left = [node.stringValue  floatValue];
-        } else if ([node.name isEqualToString: @"y"]) {
-            rect.top  = [node.stringValue floatValue];
-        } else if ([node.name isEqualToString: @"width"]) {
-            
-            rect.right = [node.stringValue floatValue] - rect.left;
-            if ([self.name isEqualToString:@"label"]) {
-                /// 修复lable宽度，自动布局时，宽度自适应
-                //                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-                //                rect.right =  fixW;
-            }
-        } else if ([node.name isEqualToString: @"height"]) {
-            rect.bottom = rect.top + [node.stringValue floatValue];
-        }
-    }
-    return rect;
+static const char skRectKey = '\0';
+- (_orgBounds *)skRect
+{
+    return objc_getAssociatedObject(self, &skRectKey);
 }
+
 -(void)setSkRect:(_orgBounds *)rect {
+    objc_setAssociatedObject(self, &skRectKey, rect, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    
     NSXMLElement *rectElement = [self firstElementByName:@"rect"];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
-            [node setStringValue: @(rect.left).stringValue];
+            [node setStringValue: @(rect.left * 0.5).stringValue];
         } else if ([node.name isEqualToString: @"y"]) {
-            [node setStringValue: @(rect.top).stringValue];
+            [node setStringValue: @(rect.top * 0.5).stringValue];
         } else if ([node.name isEqualToString: @"width"]) {
-            [node setStringValue: @(rect.right - rect.left).stringValue];
+            CGFloat w = (rect.right - rect.left)*0.5;
             if ([self.name isEqualToString:@"label"]) {
-                /// 修复lable宽度，自动布局时，宽度自适应
-                //                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-                //                [node setStringValue: fixW];
+                w += 2;
             }
+            [node setStringValue: @(w).stringValue];
         } else if ([node.name isEqualToString: @"height"]) {
-            [node setStringValue: @(rect.bottom-rect.top).stringValue];
+            CGFloat h = (rect.bottom-rect.top)*0.5;
+            if ([self.name isEqualToString:@"label"]) {
+                h += 7;
+            }
+            [node setStringValue: @(h).stringValue];
         }
     }
 }
@@ -417,6 +404,9 @@
             // 文本
             NSXMLElement *labelElement = [self getNewlabelElement];
             labelElement.text = view.textInfo.text;
+            if ([labelElement.text isEqualToString:@"设备检测"]) {
+                NSLog(@"---%@---",@"ff");
+            }
             labelElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
             labelElement.fontStyle = view.textInfo.fontPostScriptName;
             
@@ -440,14 +430,7 @@
         
         NSLog(@"--未知类型控件--%@---", viewType);
     }
-    _orgBounds *rightF = [_orgBounds new];
-    rightF.top = view.bounds.top * 0.5;
-    rightF.left = view.bounds.left * 0.5;
-    rightF.bottom = view.bounds.bottom * 0.5;
-    rightF.right = view.bounds.right * 0.5;
-    
-    aNewWillBeAddedViewElement.skRect = rightF;
-    
+    aNewWillBeAddedViewElement.skRect = view.bounds;
     return  aNewWillBeAddedViewElement;
 }
 + (void)setRandomIdForElement:(NSXMLElement *)element {

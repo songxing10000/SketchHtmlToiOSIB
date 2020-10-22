@@ -204,18 +204,24 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     if (!viewItem || !viewElement || viewItem.layers.count <= 0) {
         return;
     }
-    for (VisibleItem *subViewItem in viewItem.layers) {
+    
+    [viewItem.layers enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(VisibleItem * _Nonnull subViewItem, NSUInteger idx, BOOL * _Nonnull stop) {
+       
         NSXMLElement *subViewElement = [NSXMLElement elementWithItem:subViewItem];
         // frame 转换
-        subViewItem.bounds.left = subViewItem.bounds.left - viewElement.skRect.left;
-        subViewItem.bounds.top = subViewItem.bounds.top - viewElement.skRect.top;
-
+        _orgBounds *rightF = [_orgBounds new];
+        rightF.top = labs(subViewItem.bounds.top- viewElement.skRect.top);
+        rightF.left = labs(viewElement.skRect.left - subViewItem.bounds.left) ;
+        rightF.bottom = subViewElement.skRect.bottom - subViewElement.skRect.top + rightF.top;
+        rightF.right = subViewElement.skRect.right - subViewElement.skRect.left + rightF.left;
+        
+        subViewElement.skRect = rightF;
         
         [self addSubViewElement:subViewElement subViewItem:subViewItem inSuperViewElement:viewElement fromSbDocument: sbDocument];
         if (subViewItem.layers.count > 0) {
             [self createSubViewWithViewItem:subViewItem viewElement:subViewElement fromSbDocument:sbDocument];
         }
-    }
+    }];
 }
 - (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath {
     
@@ -441,62 +447,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     return YES;
 }
 #pragma mark - get view add view
-/// 移动子元素到父元素内，添加子view到其父view上
-- (void)moveSubviewElement:(NSXMLElement *)subViewElement toSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument needChangeXY:(BOOL)needChangeXY{
-    
-    if (!subViewElement) {
-        NSLog(@"未找到 %@", subViewElement);
-        return;
-    }
-    if (!superViewElement) {
-        NSLog(@"未找到 %@", superViewElement);
-        return;
-    }
-    NSXMLElement *subViewSuperView = [superViewElement firstElementByName:@"subviews"];
-    if ([superViewElement.name isEqualToString:@"label"] ||
-        [superViewElement.name isEqualToString:@"imageView"] ||
-        [superViewElement.name isEqualToString:@"button"]) {
-        
-        return;
-    }
-    if (needChangeXY) {
-        _orgBounds *oldSuperR = superViewElement.skRect;
-        _orgBounds *oldSelfR = subViewElement.skRect;
-        /// 更新 移动到父控件里的x y
-        oldSelfR.left = oldSelfR.left - oldSuperR.left;
-        oldSelfR.top = oldSelfR.top - oldSuperR.top;
-        if (oldSelfR.top <= 0) {
-            oldSelfR.top = 0;
-        }
-        subViewElement.skRect = oldSelfR;
-    }
-    
-    // 考虑 更新 x y
-    [subViewSuperView addChild:subViewElement];
-    
-    if ([subViewElement.name isEqualToString:@"imageView"]) {
-        //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
-        
-        NSXMLElement *imageNode = [NSXMLElement elementWithName:@"image"];
-        NSString *imgName = [subViewElement attributeForName:@"image"].stringValue;
-        
-        if (imgName && imgName.length > 0) {
-            [imageNode addAttribute:[NSXMLNode attributeWithName:@"name" stringValue: imgName]];
-            [imageNode addAttribute:[NSXMLNode attributeWithName:@"width" stringValue:@"16"]];
-            [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
-            NSXMLElement *resources =
-            [sbDocument.rootElement firstElementByName:@"resources"];
-            NSMutableArray<NSString *> *imgNames = [NSMutableArray array];
-            for (NSXMLElement * obj in [resources children]) {
-                [imgNames addObject: [obj m_getValueForKey:@"name"]];
-            }
-            
-            if (![imgNames containsObject: imgName]) {
-                [resources addChild:imageNode.copy];
-            }
-        }
-    }
-}
 - (NSXMLElement *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
     if (!vcElement) {
         NSLog(@"未找到 %@", vcElement);
@@ -616,11 +566,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSXMLElement *objects =  [element firstElementByName: @"objects" ];
     NSXMLElement *viewController =  [objects firstElementByName: @"viewController" ];
     [viewController m_setValue: text forKey: @"userLabel"];
-}
-- (CGRect)getCGRectFrom_orgBounds:(_orgBounds *)desSR {
-    CGRect rect =
-    CGRectMake(desSR.left, desSR.top, desSR.right-desSR.left, desSR.bottom-desSR.top);
-    return rect;
 }
 /// 如页面太长，改变页面长度
 - (void)changeVCSizeForVCElement:(NSXMLElement *)vcElement vcViews:(NSArray <VisibleItem *> *)views {
