@@ -161,29 +161,78 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     return subString ;
 }
 
+- (void)addSubViewElement:(NSXMLElement *)subViewElement subViewItem:(VisibleItem *)subViewItem inSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument{
+    if (!subViewElement) {
+        NSLog(@"未找到 %@", subViewElement);
+        return;
+    }
+    if (!superViewElement) {
+        NSLog(@"未找到 %@", superViewElement);
+        return;
+    }
+    NSXMLElement *subViewSuperView = [superViewElement firstElementByName:@"subviews" ];
+    
+    
+    [subViewSuperView addChild:subViewElement];
+    
+    if ([subViewElement.name isEqualToString:@"imageView"]) {
+        //如果添加imageView 得<image name="fff.png" width="16" height="16"/>
+        
+        NSXMLElement *imageNode = [NSXMLElement elementWithName:@"image"];
+        NSString *imgName = [subViewElement attributeForName:@"image"].stringValue;
+        
+        if (imgName && imgName.length > 0) {
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"name" stringValue: imgName]];
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"width" stringValue:@"16"]];
+            [imageNode addAttribute:[NSXMLNode attributeWithName:@"height" stringValue:@"16"]];
+            NSXMLElement *resources =
+            [sbDocument.rootElement firstElementByName:@"resources"];
+            NSMutableArray<NSString *> *imgNames = [NSMutableArray array];
+            for (NSXMLElement * obj in [resources children]) {
+                [imgNames addObject: [obj m_getValueForKey:@"name"]];
+            }
+            
+            if (![imgNames containsObject: imgName]) {
+                [resources addChild:imageNode.copy];
+            }
+        }
+    }
+}
+
+
+- (void)createSubViewWithViewItem:(VisibleItem *)viewItem  viewElement:(NSXMLElement *)viewElement  fromSbDocument:(NSXMLDocument *)sbDocument {
+    if (!viewItem || !viewElement || viewItem.layers.count <= 0) {
+        return;
+    }
+    for (VisibleItem *subViewItem in viewItem.layers) {
+        NSXMLElement *subViewElement = [NSXMLElement elementWithItem:subViewItem];
+        
+        [self addSubViewElement:subViewElement subViewItem:subViewItem inSuperViewElement:viewElement fromSbDocument: sbDocument];
+        if (subViewItem.layers.count > 0) {
+            [self createSubViewWithViewItem:subViewItem viewElement:subViewElement fromSbDocument:sbDocument];
+        }
+    }
+}
 - (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath {
+    
     if (!sbDesPath || !object) {
         return;
     }
+    
     NSXMLDocument *sbDocument = [NSXMLElement documentWithXmlFileName:@"sb"];
-    
-    NSXMLElement *scenes =
-    [sbDocument.rootElement firstElementByName:@"scenes"];
-    
     NSXMLElement *vcElement = [NSXMLElement getNewVCElement];
-    NSArray <VisibleItem *> *views = object.visible;
-    // 如果有可能加长页面
-    [self changeVCSizeForVCElement:vcElement vcViews:views];
-    for (VisibleItem *view in views) {
-        
-        NSXMLElement *aNewWillBeAddedViewElement = [NSXMLElement elementWithItem:view];
-        if (!aNewWillBeAddedViewElement) {
-            continue;
-        }
-        [self addSubviewElement:aNewWillBeAddedViewElement
-                    inVCElement:vcElement
-                 fromSbDocument:sbDocument];
+    NSArray <VisibleItem *> *viewItems = object.visible;
+    [self changeVCSizeForVCElement:vcElement vcViews:viewItems];
+    
+    for (VisibleItem *viewItem in viewItems) {
+        NSXMLElement *viewElement = [NSXMLElement elementWithItem:viewItem];
+        [self addSubviewElement: viewElement
+                    inVCElement: vcElement
+                 fromSbDocument: sbDocument];
+        // 尝试生成viewElement的子控件
+        [self createSubViewWithViewItem:viewItem viewElement:viewElement fromSbDocument:sbDocument];
     }
+    NSXMLElement *scenes = [sbDocument.rootElement firstElementByName:@"scenes"];
     [scenes addChild: vcElement];
     
     NSLog(@"----%@---", @"写入完成");
@@ -464,6 +513,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSXMLElement *subViewSuperView = [viewElement firstElementByName:@"subviews"];
     return subViewSuperView;
 }
+
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
         NSLog(@"未找到 %@", subViewElement);
