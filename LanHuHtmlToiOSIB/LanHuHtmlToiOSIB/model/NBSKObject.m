@@ -3,7 +3,7 @@
 @implementation NBSKObject
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{
-             @"visible": [VisibleItem class]
+        @"visible": [VisibleItem class]
     };
 }
 @end

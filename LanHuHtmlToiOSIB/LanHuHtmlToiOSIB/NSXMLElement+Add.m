@@ -34,8 +34,8 @@
             rect.right = [node.stringValue floatValue] - rect.left;
             if ([self.name isEqualToString:@"label"]) {
                 /// 修复lable宽度，自动布局时，宽度自适应
-//                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-//                rect.right =  fixW;
+                //                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+                //                rect.right =  fixW;
             }
         } else if ([node.name isEqualToString: @"height"]) {
             rect.bottom = rect.top + [node.stringValue floatValue];
@@ -55,8 +55,8 @@
             [node setStringValue: @(rect.right - rect.left).stringValue];
             if ([self.name isEqualToString:@"label"]) {
                 /// 修复lable宽度，自动布局时，宽度自适应
-//                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-//                [node setStringValue: fixW];
+                //                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+                //                [node setStringValue: fixW];
             }
         } else if ([node.name isEqualToString: @"height"]) {
             [node setStringValue: @(rect.bottom-rect.top).stringValue];
@@ -100,15 +100,15 @@
 }
 -(NSString *)titleColor {
     return [self getColorType: @"titleColor"];
-
+    
 }
 -(void)setTitleColor:(NSString *)titleColor {
     [self setColor:titleColor type:@"titleColor"];
-
+    
 }
 -(NSString *)textColor {
     return [self getColorType: @"textColor"];
-
+    
 }
 -(void)setTextColor:(NSString *)textColor {
     [self setColor:textColor type:@"textColor"];
@@ -379,17 +379,17 @@
             [fontDescription m_setValue:@"Helvetica" forKey: @"name"];
             [fontDescription m_setValue:@"Helvetica" forKey: @"family"];
         } else {
-
+            
             NSLog(@"找不到字体：%@", fontStyleName);
         }
     }
 }
-    /// 34 转换成 34/255
-    -(NSString*)getColorValueFromStr:(NSString *)input{
-        if (![input containsString: @"."]) {
-            // 整数
-            return [NSString stringWithFormat:@"%.17f", [input intValue] / 255.0];
-        }
-        return  @"ff";
+/// 34 转换成 34/255
+-(NSString*)getColorValueFromStr:(NSString *)input{
+    if (![input containsString: @"."]) {
+        // 整数
+        return [NSString stringWithFormat:@"%.17f", [input intValue] / 255.0];
     }
+    return  @"ff";
+}
 @end

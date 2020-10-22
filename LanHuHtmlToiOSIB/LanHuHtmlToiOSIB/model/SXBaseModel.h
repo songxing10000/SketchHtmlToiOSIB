@@ -2,9 +2,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SXBaseModel : NSObject
-
-/// [[self alloc] init];
-+(instancetype)new;
 /**
  获取模型
  @param json `NSDictionary`或 JSON字符串 或 `NSData`.
@@ -12,7 +9,7 @@
  */
 + (instancetype)objWithJSON:(id)json;
 /// 字典数组转模型数组
-+ (NSMutableArray *)objsFromDicts:(NSArray<NSDictionary*>*)dicts;
++ (NSArray *)objsFromDicts:(NSArray<NSDictionary*>*)dicts;
 
 
 /// 字典或者数组

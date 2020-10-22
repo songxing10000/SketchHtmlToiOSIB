@@ -125,7 +125,7 @@
 @property(nonatomic, copy) NSString *base;
 /// "png_xxxhd":"https://lanhu.oss-cn-beijing.aliyuncs.com/pscce0b307a9f36f70-4735-4578-a31e-ab5dd7af7455"
 @property(nonatomic, copy) NSString *png_xxxhd;
- 
+
 
 @end
 @interface BlendOptions: SXBaseModel
