@@ -188,19 +188,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 
  @param view 要判断的view
  */
-- (BOOL)canIgnoreView:(SKLayer *)view {
-    if (!view.objectID) {
-        return YES;
-    }
-    if (view.rect.x.intValue <= 16 &&
-        view.rect.y.intValue <= 36 &&
-        view.rect.width.intValue <= 9 &&
-        view.rect.height.intValue <= 26 ) {
-        /// 不添加把返回按钮
-        return YES;
-    } else if (view.rect.y.intValue < 20 &&
-               view.rect.height.intValue <= 20 ) {
-        // 不添加状态栏上的控件
+- (BOOL)canIgnoreView:(VisibleItem *)view {
+    if (!view.visible) {
         return YES;
     }
     return NO;
@@ -213,18 +202,13 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     
     NSXMLElement *scenes =
     [sbDocument.rootElement firstElementByName:@"scenes"];
-    [self.hud show:YES];
-    for (ArtboardsItem *vc in object.artboards) {
-        /// 调试某个特定页面可这样写
-//                if (![vc.name isEqualToString: @"B01车源详情"]) {
-//                    NSLog(@"---%@---", vc.name);
-//                continue;
-//
-//                }
+    
+//    for (VisibleItem *vc in object.visible) {
+
         NSXMLElement *vcElement = [self getNewVCElement];
-        NSArray <SKLayer *> *views = vc.layers;
+        NSArray <VisibleItem *> *views = object.visible;
         [self changeVCSizeForVCElement:vcElement vcViews:views];
-        for (SKLayer *view in views) {
+        for (VisibleItem *view in views) {
             if ([self canIgnoreView:view]) {
                 continue;
             }
@@ -233,25 +217,19 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             NSString *viewType = view.type;
             /// 将要被添加的新的 view NSXMLElement 对象
             NSXMLElement *aNewWillBeAddedViewElement = nil;
-            if ([viewType isEqualToString:@"text"]) {
-                /// ffffff 这种颜色的label不可能是输入框
-                NSString *textColor = @"";
-                if(view.fills.count > 0) {
-                    textColor = view.fills[0].color.uiColor ;
-                } else if (view.css.count > 2) {
-                    textColor = view.css[2];
-                }
+            if ([viewType isEqualToString:@"textLayer"] || view.text) {
                 
-                if (([view.content hasPrefix: @"请输入"] ||
-                    [view.content hasPrefix: @"请填写"]) && ![textColor containsString:@"FFFFFF"]) {
+                
+                if (([view.textInfo.text hasPrefix: @"请输入"] ||
+                    [view.textInfo.text hasPrefix: @"请填写"]) ) {
 #pragma mark - UITextFiled
                     // 输入框
                     NSXMLElement *textFiledElement = [self getNewTextFiledElement];
                     // placeholder
-                    [textFiledElement m_setValue: view.content forKey: @"placeholder"];
+                    [textFiledElement m_setValue: view.textInfo.text forKey: @"placeholder"];
                     
-                    textFiledElement.fontSize = view.fontSize;
-                    textFiledElement.fontStyle = view.fontFace;
+                    textFiledElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
+                    textFiledElement.fontStyle = view.textInfo.fontPostScriptName;
                     // placeholder 颜色xml内置
                     // 正常情况下的文字颜色 xml内置
                     
@@ -263,84 +241,60 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 
                     // 文本
                     NSXMLElement *labelElement = [self getNewlabelElement];
-                    labelElement.text = view.content;
-                    labelElement.fontSize = view.fontSize;
-                    labelElement.fontStyle = view.fontFace;
+                    labelElement.text = view.textInfo.text;
+                    labelElement.fontSize = @(view.textInfo.size * 0.5).stringValue;
+                    labelElement.fontStyle = view.textInfo.fontPostScriptName;
+                    
                     labelElement.textColor =
-                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.color.r/255.0, view.color.g/255.0, view.color.b/255.0];
+                    [NSString stringWithFormat:@"(r:%f g:%f b:%f a:1.00)",view.textInfo.color.red/255.0, view.textInfo.color.green/255.0, view.textInfo.color.blue/255.0];
                     aNewWillBeAddedViewElement = labelElement;
                 }
             }
-            else if ([viewType isEqualToString:@"slice"]) {
+            else if (view.isAsset) {
                 //图片
 #pragma mark - UIImageView
                 NSXMLElement *imgElement = [self getNewImageViewElementWithImgName: view.name];
                 aNewWillBeAddedViewElement = imgElement;
             }
-            else if ([viewType isEqualToString:@"shape"]) {
-                //view
+            else if ([viewType isEqualToString:@"layerSection"]) {
 #pragma mark - UIView
-                if ([view.rect.width isEqualToString: @"375"] &&
-                    [view.rect.height isEqualToString: @"646"]) {
-                    NSLog(@"---%@---",@"fsdf");
-                }
-                NSXMLElement *viewElement = [self getNewViewElement];
-                if (view.fills && view.fills.count > 0) {
-                    // 事实证明这里取uiColor不太准确，尝试取 cssRgba, 如果有的话
-                    if (view.fills[0].color.cssRgba.length > 0) {
-                        
-                        viewElement.backgroundColor = view.fills[0].color.cssRgba ;
-
-                    } else {
-                        
-                        viewElement.backgroundColor = view.fills[0].color.uiColor ;
-
-                    }
-                }
-                if (view.css && view.css.count > 0) {
-                    [self setViewCss:view.css ForElement:viewElement];
-                }
-                aNewWillBeAddedViewElement = viewElement;
+                    NSXMLElement *viewElement = [self getNewViewElement];
+                    aNewWillBeAddedViewElement = viewElement;
             }
             else {
                 
                 NSLog(@"--未知类型控件--%@---", viewType);
             }
+            _orgBounds *rightF = [_orgBounds new];
+            rightF.top = view.bounds.top * 0.5;
+            rightF.left = view.bounds.left * 0.5;
+            rightF.bottom = view.bounds.bottom * 0.5;
+            rightF.right = view.bounds.right * 0.5;
             
-            if (view.opacity) {
-                // 暂忽略 透明度，用到的场景太少
-//                [self setAlpha:view.opacity ForElement:aNewWillBeAddedViewElement];
-            }
-            aNewWillBeAddedViewElement.skRect = view.rect;
-            if ([view.rect.y isEqualToString: @"30"]||
-                [view.rect.y isEqualToString: @"31"]) {
-                //可能是标题
-                [self setLable:view.content forVCElement:vcElement];
-            } else {
-                [self setLable:vc.name forVCElement:vcElement];
-            }
+            aNewWillBeAddedViewElement.skRect = rightF;
+
             if (!aNewWillBeAddedViewElement) {
                 continue;
             }
             NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement].children;
-            NSMutableArray<SKRect *> *rootViewSubViewSKRects = [NSMutableArray array];
+            NSMutableArray<_orgBounds *> *rootViewSubView_orgBoundss = [NSMutableArray array];
             for (NSXMLElement *rootViewSubViewElement in rootViewSubViewElements) {
-                [rootViewSubViewSKRects addObject:  rootViewSubViewElement.skRect];
+                [rootViewSubView_orgBoundss addObject:  rootViewSubViewElement.skRect];
             }
             /// 将要被添加的新的 view NSXMLElement 对象的 CGRect值
             CGRect aNewWillBeAddedViewRect =  aNewWillBeAddedViewElement.cgRect;
             BOOL hasSuperViewInRootView = NO;
-            for (SKRect *rootViewSubViewSKRect in rootViewSubViewSKRects) {
+            for (_orgBounds *rootViewSubView_orgBounds in rootViewSubView_orgBoundss) {
                 
                 CGRect superViewInRootViewCGRect =
-                [self getCGRectFromSKRect:rootViewSubViewSKRect];
+                [self getCGRectFrom_orgBounds:rootViewSubView_orgBounds];
                 
                 if ( !CGRectContainsRect(superViewInRootViewCGRect, aNewWillBeAddedViewRect) ) {
                     continue;
                 }
                 hasSuperViewInRootView = YES;
                 NSUInteger findedSuperViewIdx =
-                [rootViewSubViewSKRects indexOfObject: rootViewSubViewSKRect];
+                [rootViewSubView_orgBoundss indexOfObject: rootViewSubView_orgBounds];
                 
                 NSXMLElement *superViewInRootViewElement =
                 rootViewSubViewElements[findedSuperViewIdx];
@@ -349,31 +303,31 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 NSArray<NSXMLElement *> *superViewInRootViewSubElements =
                 [self getSubViewElementInElement: superViewInRootViewElement].children;
                 //
-                NSMutableArray<SKRect *> *superViewInRootViewSubSKRects = [NSMutableArray array];
+                NSMutableArray<_orgBounds *> *superViewInRootViewSub_orgBoundss = [NSMutableArray array];
                 for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
-                    [superViewInRootViewSubSKRects addObject:  superViewInRootViewSubElement.skRect];
+                    [superViewInRootViewSub_orgBoundss addObject:  superViewInRootViewSubElement.skRect];
                 }
                 /// 在父控件里又有父控件
                 BOOL hasSuperViewInSuperView = NO;
-                for (SKRect *superViewInRootViewSubSKRect in superViewInRootViewSubSKRects) {
+                for (_orgBounds *superViewInRootViewSub_orgBounds in superViewInRootViewSub_orgBoundss) {
                     //
-                    CGRect superViewInSuperViewCGRect = [self getCGRectFromSKRect: superViewInRootViewSubSKRect];
-                    /// 最开始要加的父控件的SKRect
-                    SKRect *firstSuperSKRect =  superViewInRootViewElement.skRect;
+                    CGRect superViewInSuperViewCGRect = [self getCGRectFrom_orgBounds: superViewInRootViewSub_orgBounds];
+                    /// 最开始要加的父控件的_orgBounds
+                    _orgBounds *firstSuper_orgBounds =  superViewInRootViewElement.skRect;
                     /// 坐标系转换
-                    SKRect *oldSelfR =  aNewWillBeAddedViewElement.skRect;
-                    oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
-                    oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - firstSuperSKRect.y.integerValue)];
-                    if (oldSelfR.y.integerValue <= 0) {
-                        oldSelfR.y = @"0";
+                    _orgBounds *oldSelfR =  aNewWillBeAddedViewElement.skRect;
+                    oldSelfR.left = oldSelfR.left - firstSuper_orgBounds.left;
+                    oldSelfR.top = oldSelfR.top - firstSuper_orgBounds.top;
+                    if (oldSelfR.top <= 0) {
+                        oldSelfR.top = 0;
                     }
                     
-                    if (! CGRectContainsRect(superViewInSuperViewCGRect, [self getCGRectFromSKRect:oldSelfR]) ) {
+                    if (! CGRectContainsRect(superViewInSuperViewCGRect, [self getCGRectFrom_orgBounds:oldSelfR]) ) {
                         continue;
                     }
                     hasSuperViewInSuperView = YES;
                     //
-                    NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSubSKRects indexOfObject:superViewInRootViewSubSKRect];
+                    NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSub_orgBoundss indexOfObject:superViewInRootViewSub_orgBounds];
                     NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
                     aNewWillBeAddedViewElement.skRect = oldSelfR;
                     [self moveSubviewElement: aNewWillBeAddedViewElement
@@ -411,9 +365,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         // 尝试加入按钮
         [self generateBtnInRootViewFromVC:vcElement fromSbDocument:sbDocument];
         [scenes addChild: vcElement];
-        self.hud.progress = (scenes.childCount+1)/(object.artboards.count+1);
-        self.hud.labelText = [NSString stringWithFormat:@"%tu/%tu",scenes.childCount,object.artboards.count];
-        if (scenes.childCount == object.artboards.count) {
+        
             NSLog(@"----%@---", @"写入完成");
 //            [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
 //
@@ -429,12 +381,11 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             // 打开临时工程
             [[NSWorkspace sharedWorkspace] selectFile:proFilePath inFileViewerRootedAtPath:proFilePath];
             [[NSWorkspace sharedWorkspace] openFile:proFilePath withApplication:@"Xcode"];
-        }
         
-    }
+        
+    
     
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
-    [self.hud hide:YES];
     
 }
 
@@ -624,8 +575,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
             }
             // view 包含一个  label
             NSXMLElement *button = [self getNewButtonElement];
-            if (rootViewSubE.skRect.y.integerValue < 0) {
-                rootViewSubE.skRect.y = @"0";
+            if (rootViewSubE.skRect.top < 0) {
+                rootViewSubE.skRect.top = 0;
             }
             // 更新button frame
             button.skRect = rootViewSubE.skRect;
@@ -695,15 +646,15 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
                 
                 [[self getSubViewElementInElement: rootViewSubE] removeChildAtIndex: idx];
                 // 更新button frame  这里坐标系 转换，有点头晕，后续有问题再修改
-                SKRect *firstSuperSKRect = rootViewSubE.skRect;
+                _orgBounds *firstSuper_orgBounds = rootViewSubE.skRect;
                 /// 坐标系转换
-                SKRect *oldSelfR = button.skRect;
-                oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - firstSuperSKRect.x.integerValue)];
-                NSInteger yStart = oldSelfR.y.integerValue - firstSuperSKRect.y.doubleValue;
+                _orgBounds *oldSelfR = button.skRect;
+                oldSelfR.left = oldSelfR.left - firstSuper_orgBounds.left;
+                NSInteger yStart = oldSelfR.top - firstSuper_orgBounds.top;
                 if (yStart < 0) {
                     yStart = 0;
                 }
-                oldSelfR.y = [NSString stringWithFormat:@"%zd", yStart];
+                oldSelfR.top = yStart;
 //                button.skRect = oldSelfR;
                 
                 [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument needChangeXY:NO];
@@ -755,13 +706,13 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         return;
     }
     if (needChangeXY) {
-        SKRect *oldSuperR = superViewElement.skRect;
-        SKRect *oldSelfR = subViewElement.skRect;
+        _orgBounds *oldSuperR = superViewElement.skRect;
+        _orgBounds *oldSelfR = subViewElement.skRect;
         /// 更新 移动到父控件里的x y
-        oldSelfR.x = [NSString stringWithFormat:@"%zd", (oldSelfR.x.integerValue - oldSuperR.x.integerValue)];
-        oldSelfR.y = [NSString stringWithFormat:@"%zd", (oldSelfR.y.integerValue - oldSuperR.y.integerValue)];
-        if (oldSelfR.y.integerValue <= 0) {
-            oldSelfR.y = @"0";
+        oldSelfR.left = oldSelfR.left - oldSuperR.left;
+        oldSelfR.top = oldSelfR.top - oldSuperR.top;
+        if (oldSelfR.top <= 0) {
+            oldSelfR.top = 0;
         }
         subViewElement.skRect = oldSelfR;
     }
@@ -825,22 +776,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSXMLElement *vc = [object firstElementByName:@"viewController" ];
     NSXMLElement *view = [vc firstElementByName:@"view"];
     NSXMLElement *subViewSuperView = [view firstElementByName:@"subviews"];
-    /// 限制加入子控件的个数
-    //    if (subViewSuperView.childCount > 80) {
-    if ([subViewElement.name isEqualToString:@"label"]) {
-        NSString *labelText = [subViewElement attributeForName:@"text"].stringValue;
-        NSNumber *preCount = self.labelCountDict[labelText];
-        if (!preCount || [preCount isEqual:@0]) {
-            self.labelCountDict[labelText] = @1;
-        } else {
-            self.labelCountDict[labelText] = @(preCount.intValue + 1);
-        }
-        if (self.labelCountDict[labelText].intValue > 80) {
-            NSLog(@"--%@--%@---", @"添加太多一样的label了", labelText);
-            return;
-        }
-    }
-    //    }
+    
     
     [subViewSuperView addChild:subViewElement];
     
@@ -978,24 +914,24 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSXMLElement *viewController =  [objects firstElementByName: @"viewController" ];
     [viewController m_setValue: text forKey: @"userLabel"];
 }
-- (CGRect)getCGRectFromSKRect:(SKRect *)desSR {
+- (CGRect)getCGRectFrom_orgBounds:(_orgBounds *)desSR {
     CGRect rect =
-    CGRectMake(desSR.x.floatValue, desSR.y.floatValue, desSR.width.floatValue, desSR.height.floatValue);
+    CGRectMake(desSR.left, desSR.top, desSR.right-desSR.left, desSR.bottom-desSR.top);
     return rect;
 }
 
-- (void)changeVCSizeForVCElement:(NSXMLElement *)vcElement vcViews:(NSArray <SKLayer *> *)views {
+- (void)changeVCSizeForVCElement:(NSXMLElement *)vcElement vcViews:(NSArray <VisibleItem *> *)views {
     /// 设计稿 375*667
     CGFloat screenH = 667;
-    NSArray<NSString *> *viewYs = [views valueForKeyPath:@"rect.y"];
-    NSArray<NSString *> *viewHs = [views valueForKeyPath:@"rect.height"];
-    NSMutableArray<NSNumber *> *maxYs = [NSMutableArray array];
-    [viewYs enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSString * _Nonnull y, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSInteger aY = viewHs[idx].integerValue + y.integerValue;
-        [maxYs addObject:@(aY)];
-    }];
+
+    NSMutableArray<NSNumber *> *viewBottoms = @[].mutableCopy;
+    for (VisibleItem *sub in views) {
+        if (sub.bounds && sub.bounds.bottom) {
+            [viewBottoms addObject: @(sub.bounds.bottom*0.5)];
+        }
+    }
     
-    CGFloat max =[[maxYs valueForKeyPath:@"@max.floatValue"] floatValue];
+    CGFloat max =[[viewBottoms valueForKeyPath:@"@max.floatValue"] floatValue];
     if (screenH < max) {
         // 这里可以先添加一个scrollView在根view上，再添加其他子控件
         

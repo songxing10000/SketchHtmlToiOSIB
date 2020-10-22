@@ -10,54 +10,56 @@
 
 @implementation NSXMLElement (Add)
 -(CGRect)cgRect {
-    SKRect *skRect = self.skRect;
+    _orgBounds *skRect = self.skRect;
+    
     CGRect rect =
-    CGRectMake(skRect.x.floatValue, skRect.y.floatValue, skRect.width.floatValue, skRect.height.floatValue);
+    CGRectMake(skRect.left, skRect.top, skRect.left-skRect.right, skRect.bottom-skRect.top);
     return rect;
 }
 -(void)setCgRect:(CGRect)cgRect {
     
 }
--(SKRect *)skRect {
-    SKRect *rect = [SKRect new];
+-(_orgBounds *)skRect {
+    _orgBounds *rect = [_orgBounds new];
     NSXMLElement *rectElement = [self firstElementByName:@"rect"];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
             
-            rect.x = node.stringValue;
+            rect.left = [node.stringValue  floatValue];
         } else if ([node.name isEqualToString: @"y"]) {
-            rect.y  = node.stringValue;
+            rect.top  = [node.stringValue floatValue];
         } else if ([node.name isEqualToString: @"width"]) {
-            rect.width = node.stringValue;
+            
+            rect.right = [node.stringValue floatValue] - rect.left;
             if ([self.name isEqualToString:@"label"]) {
                 /// 修复lable宽度，自动布局时，宽度自适应
-                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-                rect.width =  fixW;
+//                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+//                rect.right =  fixW;
             }
         } else if ([node.name isEqualToString: @"height"]) {
-            rect.height = node.stringValue;
+            rect.bottom = rect.top + [node.stringValue floatValue];
         }
     }
     return rect;
 }
--(void)setSkRect:(SKRect *)rect {
+-(void)setSkRect:(_orgBounds *)rect {
     NSXMLElement *rectElement = [self firstElementByName:@"rect"];
     NSArray<NSXMLNode *> *nodes = rectElement.attributes;
     for (NSXMLNode *node in nodes) {
         if ([node.name isEqualToString: @"x"]) {
-            [node setStringValue: rect.x];
+            [node setStringValue: @(rect.left).stringValue];
         } else if ([node.name isEqualToString: @"y"]) {
-            [node setStringValue: rect.y];
+            [node setStringValue: @(rect.top).stringValue];
         } else if ([node.name isEqualToString: @"width"]) {
-            [node setStringValue: rect.width];
+            [node setStringValue: @(rect.right - rect.left).stringValue];
             if ([self.name isEqualToString:@"label"]) {
                 /// 修复lable宽度，自动布局时，宽度自适应
-                NSString *fixW = @(rect.width.integerValue+6).stringValue;
-                [node setStringValue: fixW];
+//                NSString *fixW = @(rect.width.integerValue+6).stringValue;
+//                [node setStringValue: fixW];
             }
         } else if ([node.name isEqualToString: @"height"]) {
-            [node setStringValue: rect.height];
+            [node setStringValue: @(rect.bottom-rect.top).stringValue];
         }
     }
 }

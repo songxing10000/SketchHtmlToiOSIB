@@ -58,23 +58,5 @@
     return basePath;
 }
 #pragma mark - getter and setter
--(MBProgressHUD *)hud {
-    if (_hud) {
-        return _hud;
-    }
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
-    hud.progress = 0.1;
-    _hud = hud;
-    return _hud;
-}
--(NSMutableDictionary<NSString *,NSNumber *> *)labelCountDict {
-    if (_labelCountDict) {
-        return _labelCountDict;
-    }
-    NSMutableDictionary *labelCountDict = @{}.mutableCopy;
-    _labelCountDict = labelCountDict;
-    return _labelCountDict;
-}
 @end
 

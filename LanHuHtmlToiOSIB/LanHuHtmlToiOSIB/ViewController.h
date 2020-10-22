@@ -7,12 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <MBProgressHUD.h>
+
 
 @interface ViewController : NSViewController
 
-@property(nonatomic, strong) MBProgressHUD *hud;
-/// {label的字 : 被加入的次数}
-@property(nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *labelCountDict;
 @end
 

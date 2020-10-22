@@ -2,9 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/dfpo/Desktop/git&#x8ddf;&#x8e2a;&#x9879;&#x76ee;/SketchHtmlToiOSIB/LanHuHtmlToiOSIB/LanHuHtmlToiOSIB.xcodeproj">
+      location = "group:/Users/dfpo/Desktop/git跟踪项目/SketchHtmlToiOSIB/LanHuHtmlToiOSIB/LanHuHtmlToiOSIB.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:LanHuHtmlToiOSIB.xcodeproj">
    </FileRef>
 </Workspace>
