@@ -206,6 +206,10 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
     for (VisibleItem *subViewItem in viewItem.layers) {
         NSXMLElement *subViewElement = [NSXMLElement elementWithItem:subViewItem];
+        // frame 转换
+        subViewItem.bounds.left = subViewItem.bounds.left - viewElement.skRect.left;
+        subViewItem.bounds.top = subViewItem.bounds.top - viewElement.skRect.top;
+
         
         [self addSubViewElement:subViewElement subViewItem:subViewItem inSuperViewElement:viewElement fromSbDocument: sbDocument];
         if (subViewItem.layers.count > 0) {

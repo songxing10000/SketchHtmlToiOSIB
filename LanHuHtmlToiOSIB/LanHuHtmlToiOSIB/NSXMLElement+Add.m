@@ -9,16 +9,7 @@
 #import "NSXMLElement+Add.h"
 #import "NSString+Add.h"
 @implementation NSXMLElement (Add)
--(CGRect)cgRect {
-    _orgBounds *skRect = self.skRect;
-    
-    CGRect rect =
-    CGRectMake(skRect.left, skRect.top, skRect.left-skRect.right, skRect.bottom-skRect.top);
-    return rect;
-}
--(void)setCgRect:(CGRect)cgRect {
-    
-}
+
 -(_orgBounds *)skRect {
     _orgBounds *rect = [_orgBounds new];
     NSXMLElement *rectElement = [self firstElementByName:@"rect"];

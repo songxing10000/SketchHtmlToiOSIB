@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// label button textFiled 字的样式类型如 苹方-简 常规体
 @property(nonatomic, copy) NSString *fontStyle;
 @property(nonatomic, strong) _orgBounds *skRect;
-@property(nonatomic, assign) CGRect cgRect;
 
 - (NSXMLElement *)firstElementByName:(NSString *)elementName;
 - (NSString *)m_getValueForKey:(NSString *)key;
