@@ -177,7 +177,6 @@
 @end
 
 @interface NBSKObject :SXBaseModel
-@property (nonatomic , strong) _orgBounds              *frame;
 @property (nonatomic , assign) NSInteger              id;
 
 /// 是否是单个页面

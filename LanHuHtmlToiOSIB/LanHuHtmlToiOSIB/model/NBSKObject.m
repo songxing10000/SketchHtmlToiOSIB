@@ -19,7 +19,7 @@
     };
 }
 + (NSDictionary *)modelCustomPropertyMapper {
-    return @{@"frame":@[@"bounds", @"_orgBounds"]};
+    return @{@"bounds":@[@"bounds", @"_orgBounds"]};
 }
 @end
 
