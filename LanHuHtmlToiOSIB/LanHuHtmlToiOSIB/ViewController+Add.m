@@ -177,104 +177,16 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     for (VisibleItem *view in views) {
         
         NSXMLElement *aNewWillBeAddedViewElement = [NSXMLElement elementWithItem:view];
-        
         if (!aNewWillBeAddedViewElement) {
             continue;
         }
-        NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement].children;
-        NSMutableArray<_orgBounds *> *rootViewSubView_orgBoundss = [NSMutableArray array];
-        for (NSXMLElement *rootViewSubViewElement in rootViewSubViewElements) {
-            [rootViewSubView_orgBoundss addObject:  rootViewSubViewElement.skRect];
-        }
-        /// 将要被添加的新的 view NSXMLElement 对象的 CGRect值
-        CGRect aNewWillBeAddedViewRect =  aNewWillBeAddedViewElement.cgRect;
-        BOOL hasSuperViewInRootView = NO;
-        for (_orgBounds *rootViewSubView_orgBounds in rootViewSubView_orgBoundss) {
-            
-            CGRect superViewInRootViewCGRect =
-            [self getCGRectFrom_orgBounds:rootViewSubView_orgBounds];
-            
-            if ( !CGRectContainsRect(superViewInRootViewCGRect, aNewWillBeAddedViewRect) ) {
-                continue;
-            }
-            hasSuperViewInRootView = YES;
-            NSUInteger findedSuperViewIdx =
-            [rootViewSubView_orgBoundss indexOfObject: rootViewSubView_orgBounds];
-            
-            NSXMLElement *superViewInRootViewElement =
-            rootViewSubViewElements[findedSuperViewIdx];
-            
-            /// 再找一找父控件里，又包含自己的真正父控件
-            NSArray<NSXMLElement *> *superViewInRootViewSubElements =
-            [self getSubViewElementInElement: superViewInRootViewElement].children;
-            //
-            NSMutableArray<_orgBounds *> *superViewInRootViewSub_orgBoundss = [NSMutableArray array];
-            for (NSXMLElement *superViewInRootViewSubElement in superViewInRootViewSubElements) {
-                [superViewInRootViewSub_orgBoundss addObject:  superViewInRootViewSubElement.skRect];
-            }
-            /// 在父控件里又有父控件
-            BOOL hasSuperViewInSuperView = NO;
-            for (_orgBounds *superViewInRootViewSub_orgBounds in superViewInRootViewSub_orgBoundss) {
-                //
-                CGRect superViewInSuperViewCGRect = [self getCGRectFrom_orgBounds: superViewInRootViewSub_orgBounds];
-                /// 最开始要加的父控件的_orgBounds
-                _orgBounds *firstSuper_orgBounds =  superViewInRootViewElement.skRect;
-                /// 坐标系转换
-                _orgBounds *oldSelfR =  aNewWillBeAddedViewElement.skRect;
-                oldSelfR.left = oldSelfR.left - firstSuper_orgBounds.left;
-                oldSelfR.top = oldSelfR.top - firstSuper_orgBounds.top;
-                if (oldSelfR.top <= 0) {
-                    oldSelfR.top = 0;
-                }
-                
-                if (! CGRectContainsRect(superViewInSuperViewCGRect, [self getCGRectFrom_orgBounds:oldSelfR]) ) {
-                    continue;
-                }
-                hasSuperViewInSuperView = YES;
-                //
-                NSUInteger findedSuperViewInSuperViewIdx = [superViewInRootViewSub_orgBoundss indexOfObject:superViewInRootViewSub_orgBounds];
-                NSXMLElement *findedSuperViewInSuperViewElement = superViewInRootViewSubElements[findedSuperViewInSuperViewIdx];
-                aNewWillBeAddedViewElement.skRect = oldSelfR;
-                [self moveSubviewElement: aNewWillBeAddedViewElement
-                      toSuperViewElement: findedSuperViewInSuperViewElement
-                          fromSbDocument: sbDocument
-                            needChangeXY: YES];
-                
-                break;
-            }
-            if (!hasSuperViewInSuperView) {
-                [self moveSubviewElement: aNewWillBeAddedViewElement
-                      toSuperViewElement: superViewInRootViewElement
-                          fromSbDocument: sbDocument
-                            needChangeXY: YES];
-            } else {
-                NSLog(@"---%@---",@"ff");
-            }
-            
-            break;
-            
-            
-        }
-        
-        
-        if (!hasSuperViewInRootView) {
-            //  在根view下面没有找到了父控件，就加入到根view下
-            [self addSubviewElement:aNewWillBeAddedViewElement
-                        inVCElement:vcElement
-                     fromSbDocument:sbDocument];
-        } else {
-            NSLog(@"---%@---",@"ff");
-        }
-        
+        [self addSubviewElement:aNewWillBeAddedViewElement
+                    inVCElement:vcElement
+                 fromSbDocument:sbDocument];
     }
-    // 尝试加入按钮
-    [self generateBtnInRootViewFromVC:vcElement fromSbDocument:sbDocument];
     [scenes addChild: vcElement];
     
     NSLog(@"----%@---", @"写入完成");
-    //            [[NSWorkspace sharedWorkspace] selectFile:sbDesPath inFileViewerRootedAtPath:sbDesPath];
-    //
-    //            [[NSWorkspace sharedWorkspace] openFile:sbDesPath withApplication:@"Xcode"];
     
     NSString *proFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@".storyboard" withString:@".xcodeproj"];
     NSString *copyToFolderFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@"temp.storyboard" withString:@"temp.xcassets/temp"];
@@ -283,15 +195,12 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     [self createTempProjectAtPath: proFilePath basisSBFileAtPath: sbDesPath htmlFilePath: htmlFilePath];
     // 生成json
     [self createJSONFileInImagesetFromCopyToFolderFilePath: copyToFolderFilePath];
-    // 打开临时工程
-    [[NSWorkspace sharedWorkspace] selectFile:proFilePath inFileViewerRootedAtPath:proFilePath];
-    [[NSWorkspace sharedWorkspace] openFile:proFilePath withApplication:@"Xcode"];
-    
-    
-    
     
     [self saveXMLDoucment:sbDocument toPath:sbDesPath];
     
+    // 打开临时工程
+    [[NSWorkspace sharedWorkspace] selectFile:proFilePath inFileViewerRootedAtPath:proFilePath];
+    [[NSWorkspace sharedWorkspace] openFile:proFilePath withApplication:@"Xcode"];
 }
 
 /**
@@ -455,119 +364,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }];
     
 }
-/// 生成某个页面中根view中的按钮
-- (void)generateBtnInRootViewFromVC:(NSXMLElement *) vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
-    
-    NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement].children;
-    
-    [rootViewSubViewElements enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubE, NSUInteger idx, BOOL * _Nonnull stop) {
-        // 根view下可组合成按钮的
-        NSArray<NSXMLElement *> *subEs = [self getSubViewElementInElement: rootViewSubE].children;
-        NSArray<NSString *> *names = [subEs valueForKeyPath:@"name"];
-        BOOL isOnleText = names.count == 1 && [names containsObject: @"label"];
-        BOOL isTextAndImg = subEs.count == 2 && [names containsObject: @"label"] &&
-        [names containsObject: @"imageView"];
-        //        if ([rootViewSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
-        if ([rootViewSubE.name isEqualToString: @"view"] && isTextAndImg) {
-            
-            NSXMLElement *label;
-            if (isOnleText) {
-                label = subEs[0];
-                
-            } else if (isTextAndImg) {
-                
-                label = subEs[[names indexOfObject: @"label"]];
-            }
-            // view 包含一个  label
-            NSXMLElement *button = [NSXMLElement getNewButtonElement];
-            if (rootViewSubE.skRect.top < 0) {
-                rootViewSubE.skRect.top = 0;
-            }
-            // 更新button frame
-            button.skRect = rootViewSubE.skRect;
-            // 更新 bgColor
-            button.backgroundColor = rootViewSubE.backgroundColor;
-            // normal 状态下的文字
-            [self setNormalText: label.text forButtonElement:button];
-            // normal 状态下的字色 字号大小
-            button.fontSize = label.fontSize;
-            button.fontStyle = label.fontStyle;
-            button.normalTitleColor = label.textColor;
-            // 删除label
-            if (subEs.count == 1) {
-                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-            } else if (subEs.count == 2) {
-                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                [[rootViewSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-            }
-            
-            // 删除 label的父控件view
-            NSArray<NSXMLElement *> *rootViewSubViewElements = [self getSubViewElementInVCElement:vcElement].children;
-            NSUInteger idx = [rootViewSubViewElements indexOfObject:rootViewSubE];
-            [[self getSubViewElementInVCElement:vcElement] removeChildAtIndex: idx];
-            [self addSubviewElement:button inVCElement:vcElement fromSbDocument:sbDocument];
-        }
-        
-        [subEs enumerateObjectsUsingBlock:^(NSXMLElement * _Nonnull rootViewSubSubE, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSArray<NSXMLElement *> *subEs2 = [self getSubViewElementInElement: rootViewSubSubE].children;
-            NSArray<NSString *> *names2 = [subEs2 valueForKeyPath:@"name"];
-            BOOL isOnleText = names2.count == 1 && [names2 containsObject: @"label"];
-            BOOL isTextAndImg = subEs2.count == 2 && [names2 containsObject: @"label"] &&
-            [names2 containsObject: @"imageView"];
-            //             if ([rootViewSubSubE.name isEqualToString: @"view"] && (isOnleText || isTextAndImg)) {
-            /// 只有文字时，先不转换成按钮
-            if ([rootViewSubSubE.name isEqualToString: @"view"] && isTextAndImg) {
-                
-                NSXMLElement *label;
-                if (isOnleText) {
-                    label = subEs2[0];
-                    
-                } else if (isTextAndImg) {
-                    
-                    label = subEs2[[names2 indexOfObject: @"label"]];
-                }
-                // view 包含一个  label
-                NSXMLElement *button = [NSXMLElement getNewButtonElement];
-                // 更新button frame
-                button.skRect = rootViewSubSubE.skRect;
-                // 更新 bgColor
-                button.backgroundColor = rootViewSubSubE.backgroundColor;
-                // normal 状态下的文字
-                [self setNormalText: label.text forButtonElement:button];
-                // normal 状态下的字色 字号大小
-                button.fontSize = label.fontSize;
-                button.fontStyle = label.fontStyle;
-                button.normalTitleColor = label.textColor;
-                // 删除label
-                if (subEs2.count == 1) {
-                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                } else if (subEs2.count == 2) {
-                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                    [[rootViewSubSubE firstElementByName: @"subviews"] removeChildAtIndex: 0];
-                }
-                
-                // 删除 label的父控件view
-                NSUInteger idx = [subEs indexOfObject:rootViewSubSubE];
-                
-                [[self getSubViewElementInElement: rootViewSubE] removeChildAtIndex: idx];
-                // 更新button frame  这里坐标系 转换，有点头晕，后续有问题再修改
-                _orgBounds *firstSuper_orgBounds = rootViewSubE.skRect;
-                /// 坐标系转换
-                _orgBounds *oldSelfR = button.skRect;
-                oldSelfR.left = oldSelfR.left - firstSuper_orgBounds.left;
-                NSInteger yStart = oldSelfR.top - firstSuper_orgBounds.top;
-                if (yStart < 0) {
-                    yStart = 0;
-                }
-                oldSelfR.top = yStart;
-                //                button.skRect = oldSelfR;
-                
-                [self moveSubviewElement:button toSuperViewElement: rootViewSubE  fromSbDocument: sbDocument needChangeXY:NO];
-            }
-        }];
-    }];
-}
-/// 输出storyboard
 - (BOOL)saveXMLDoucment:(NSXMLDocument *)XMLDoucment toPath:(NSString *)destPath {
     
     if (XMLDoucment == nil) {
