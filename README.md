@@ -3,8 +3,11 @@
 SketchHtml源码中能找到所有页面及页面内部的控件及其布局信息JSON串，解析生成对应xml控件。
 
 而有的公司可能是使用兵蓝湖，而其网页源码中没有相关信息，只有在点中某个文字图片之后才有相关的面板信息在网页内，此时只能取得单控件的信息，针对这种情况只能使用谷歌插件进行自定义处理了。
-![](lanhu11.png)
-![](lanhu22.png)
+<!-- ![](lanhu11.png)
+![](lanhu22.png) -->
+![](https://cdn.nlark.com/yuque/0/2020/png/221886/1606363183372-fc29382d-4099-4710-9b71-7e06376b26d2.png)
+![](https://cdn.nlark.com/yuque/0/2020/png/221886/1606363183973-193d41e0-e8e9-44db-835b-07ef378f8bdb.png)
+
 ## 新增功能记录
 
 1、增加子控件嵌套功能：view支持一级、二级嵌套
@@ -27,12 +30,16 @@ SketchHtml源码中能找到所有页面及页面内部的控件及其布局信�
 3.把1中存的网页的html拖入程序面板
 
 4.生成 temp.xcodeproj 至桌面
-![](show1.png)
+<!-- ![](show1.png)
 
 ![](show2.png)
 
-![](act.gif)
+![](act.gif) -->
+![](https://cdn.nlark.com/yuque/0/2020/png/221886/1606363186146-d23ca9cc-8cca-4815-b60d-fbb59ece9801.png?x-oss-process=image%2Fresize%2Cw_1466)
 
+![](https://cdn.nlark.com/yuque/0/2020/png/221886/1606363187113-05f9fff4-610c-44c1-96b9-04f5e823de6c.png?x-oss-process=image%2Fresize%2Cw_1466)
+
+![](https://cdn.nlark.com/yuque/0/2020/gif/221886/1606363179741-05b372df-7369-4beb-be06-f99de5757b66.gif)
 
 
 ## 转换成你的storyboard
