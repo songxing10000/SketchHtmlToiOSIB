@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0921CF566200F7A999 /* XMDragView.m */; };
-		041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C6D0B21CF588F00F7A999 /* XMFileItem.m */; };
 		0472C40E22BA29F3008BA6B0 /* project.pbxproj in Resources */ = {isa = PBXBuildFile; fileRef = 0472C40D22BA29F3008BA6B0 /* project.pbxproj */; };
 		048155A822BE27A400FD3CED /* textField.xml in Resources */ = {isa = PBXBuildFile; fileRef = 048155A722BE27A400FD3CED /* textField.xml */; };
 		0481C24022B5F0BD0013606E /* button.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0481C23F22B5F0BD0013606E /* button.xml */; };
@@ -32,10 +30,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		041C6D0821CF566200F7A999 /* XMDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMDragView.h; sourceTree = "<group>"; };
-		041C6D0921CF566200F7A999 /* XMDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMDragView.m; sourceTree = "<group>"; };
-		041C6D0B21CF588F00F7A999 /* XMFileItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMFileItem.m; sourceTree = "<group>"; };
-		041C6D0C21CF588F00F7A999 /* XMFileItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMFileItem.h; sourceTree = "<group>"; };
 		0472C40D22BA29F3008BA6B0 /* project.pbxproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.pbxproject; path = project.pbxproj; sourceTree = "<group>"; };
 		048155A722BE27A400FD3CED /* textField.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = textField.xml; sourceTree = "<group>"; };
 		0481C23F22B5F0BD0013606E /* button.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = button.xml; sourceTree = "<group>"; };
@@ -86,17 +80,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		041C6D0721CF565600F7A999 /* view */ = {
-			isa = PBXGroup;
-			children = (
-				041C6D0C21CF588F00F7A999 /* XMFileItem.h */,
-				041C6D0B21CF588F00F7A999 /* XMFileItem.m */,
-				041C6D0821CF566200F7A999 /* XMDragView.h */,
-				041C6D0921CF566200F7A999 /* XMDragView.m */,
-			);
-			path = view;
-			sourceTree = "<group>";
-		};
 		7DCF1F46BEA263FA437ACF72 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,7 +152,6 @@
 			isa = PBXGroup;
 			children = (
 				98DF63B125417AC800FC0513 /* LanHuHtmlToiOSIB.entitlements */,
-				041C6D0721CF565600F7A999 /* view */,
 				980BF50B21CF03C00035FF08 /* model */,
 				980BF4FE21CF03670035FF08 /* xml */,
 				9815BDC421CD47E10048AD13 /* ViewController.h */,
@@ -306,10 +288,8 @@
 				981D4E2321CE564F00B16508 /* SXBaseModel.m in Sources */,
 				9815BDC621CD47E10048AD13 /* ViewController.m in Sources */,
 				981D4E2F21CE719000B16508 /* ViewController+Add.m in Sources */,
-				041C6D0D21CF589000F7A999 /* XMFileItem.m in Sources */,
 				9815BDCE21CD47E20048AD13 /* main.m in Sources */,
 				981D4E2621CE575C00B16508 /* NBSKObject.m in Sources */,
-				041C6D0A21CF566200F7A999 /* XMDragView.m in Sources */,
 				048987F522B68A91009C4761 /* NSString+Add.m in Sources */,
 				9815BDC321CD47E10048AD13 /* AppDelegate.m in Sources */,
 				0481C24322B5F2F20013606E /* NSXMLElement+Add.m in Sources */,
@@ -381,7 +361,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -434,7 +414,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -454,6 +434,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = songxing.LanHuHtmlToiOSIB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -472,6 +453,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = songxing.LanHuHtmlToiOSIB;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

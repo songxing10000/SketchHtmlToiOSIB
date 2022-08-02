@@ -106,68 +106,12 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     }
     return rightHtmlFilePath;
 }
-- (NSString *)jsonStrWithHtmlFileAtPath:(NSString *)htmlFilePath {
-    
-    NSString *rightHtmlFilePath = [self getHtmlFilePathFromPath:htmlFilePath];
-    if(!rightHtmlFilePath) {
-        NSLog(@"没找到html文件在路径 %@",htmlFilePath);
-        return nil;
-    }
-    NSString *text = [NSString stringWithContentsOfFile:rightHtmlFilePath encoding:NSUTF8StringEncoding error:nil];
-    BOOL isLH = [text containsString: @"https://lanhuapp.com"];
-    NSString *startStr = isLH ? @"\">{" : @"SMApp(";
-    NSUInteger start = [text rangeOfString: startStr].location;
-    NSUInteger startLen = [text rangeOfString: startStr].length;
-    
-    if (start == NSNotFound) {
-        if (isLH) {
-            // 解析到的是蓝湖
-            
-        } else {
-            NSLog(@"未找到标准的数据");
-            return nil;
-        }
-    }
-    if (startLen <= 0) {
-        NSLog(@"未找到标准的数据");
-        return  nil;
-    }
-    start += startStr.length;
-    // }</span> <div
-    NSString *endStr = isLH ? @"}</span> <div data" : @") });";
-    NSUInteger end = [text rangeOfString: endStr options:(NSLiteralSearch|NSBackwardsSearch) range:NSMakeRange(start, text.length - start)].location;
-    if (end == NSNotFound) {
-        NSLog(@"结束标志");
-        return nil;
-    }
-    NSString *subString = [text substringWithRange:NSMakeRange(start, end - start)];
-    // 针对蓝湖
-    // 首部加上 [
-    // 尾部去除
-    /*
-     ,
-     "isAsset": false,
-     "isSlice": false,
-     "web_id": 1,
-     "multiple_checked": false,
-     "skip_select": false
-     }
-     */
-    if (isLH) {
-        subString = [subString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        subString = [subString stringByReplacingOccurrencesOfString:@" " withString:@""];
-        subString = [NSString stringWithFormat: @"{%@}", subString];
-    }
-    return subString ;
-}
 
 - (void)addSubViewElement:(NSXMLElement *)subViewElement subViewItem:(VisibleItem *)subViewItem inSuperViewElement:(NSXMLElement *)superViewElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
-        NSLog(@"未找到 %@", subViewElement);
         return;
     }
     if (!superViewElement) {
-        NSLog(@"未找到 %@", superViewElement);
         return;
     }
     NSXMLElement *subViewSuperView = [superViewElement firstElementByName:@"subviews" ];
@@ -223,7 +167,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         }
     }];
 }
-- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object htmlFilePath:(NSString *)htmlFilePath {
+- (void)createSBFileAtPath:(NSString *)sbDesPath withObj:(NBSKObject *)object {
     
     if (!sbDesPath || !object) {
         return;
@@ -251,7 +195,7 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
     NSString *copyToFolderFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@"temp.storyboard" withString:@"temp.xcassets/temp"];
     [[NSFileManager defaultManager] removeItemAtPath: copyToFolderFilePath error: nil];
     // 在桌面生成temp.xcodeproj临时工程关联temp.storyboard和temp.xcassets
-    [self createTempProjectAtPath: proFilePath basisSBFileAtPath: sbDesPath htmlFilePath: htmlFilePath];
+    [self createTempProjectAtPath: proFilePath basisSBFileAtPath: sbDesPath];
     // 生成json
     [self createJSONFileInImagesetFromCopyToFolderFilePath: copyToFolderFilePath];
     
@@ -267,9 +211,8 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
  
  @param proFilePath 在哪个位置创建temp.xcodeproj文件
  @param sbDesPath sb文件创建的位置
- @param htmlFilePath 输入的html文件的位置，会根据此位置抓取图片至temp.xcassets文件，生成对应JSON描述文件
  */
-- (void)createTempProjectAtPath:(NSString *)proFilePath basisSBFileAtPath:(NSString *)sbDesPath htmlFilePath:(NSString *)htmlFilePath  {
+- (void)createTempProjectAtPath:(NSString *)proFilePath basisSBFileAtPath:(NSString *)sbDesPath{
     
     createFolderAtPath(proFilePath, NO);
     
@@ -287,79 +230,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
         NSLog(@"---%@---", error.localizedDescription);
     }
     
-    // 生成图片夹
-    
-    
-    
-    //            NSString *htmlFileName = @"index.html";
-    //            NSString *htmlFilePath = [NSString stringWithFormat: @"/Users/mac/Desktop/f/%@", htmlFileName];
-    NSString *assetsFileName = @"assets";
-    NSString *assetsFilePath =
-    [htmlFilePath stringByReplacingOccurrencesOfString: @"index.html" withString: assetsFileName];
-    // Spec Export - Sketch Measure 2.3.html
-    if (![htmlFilePath containsString: @"index.html"]) {
-        assetsFilePath =
-        [htmlFilePath stringByReplacingOccurrencesOfString: @".html" withString: @"_files"];
-    }
-    BOOL isDir = NO;
-    BOOL hasThisFolder =
-    [fm fileExistsAtPath: assetsFilePath isDirectory: &isDir] && isDir ;
-    if (!hasThisFolder) {
-        return ;
-    }
-    NSString *copyToFolderFilePath = [sbDesPath stringByReplacingOccurrencesOfString:@"temp.storyboard" withString:@"temp.xcassets/temp"];
-    NSDirectoryEnumerator *myDirectoryEnumerator = [fm enumeratorAtPath: assetsFilePath];
-    NSString *assetsFolderInnerfileName = nil;
-    while((assetsFolderInnerfileName = [myDirectoryEnumerator nextObject]))
-    {
-        BOOL isDir = YES;
-        NSString *assetsFolderInnerfilePath = [assetsFilePath stringByAppendingPathComponent: assetsFolderInnerfileName];
-        BOOL isFileExist = [fm fileExistsAtPath:assetsFolderInnerfilePath isDirectory:&isDir];
-        if (!isFileExist) {
-            
-            //                return nil;
-        } else {
-            if (isDir) {
-                NSLog(@"---%@---", assetsFolderInnerfileName);
-                
-            } else {
-                
-                NSString *makeFolderName =
-                [[[[assetsFolderInnerfileName stringByReplacingOccurrencesOfString: @"@2x.png" withString:@""] stringByReplacingOccurrencesOfString: @"@3x.png" withString:@""]  stringByReplacingOccurrencesOfString: @".png" withString:@""] stringByAppendingString: @".imageset"];
-                NSString *makeFolderFilePath =
-                [copyToFolderFilePath stringByAppendingPathComponent: makeFolderName];
-                BOOL isDir = YES;
-                BOOL isFileExist = [fm fileExistsAtPath: makeFolderFilePath isDirectory:&isDir];
-                NSString *assetsFolderInnerfileNewFilePath = [makeFolderFilePath stringByAppendingPathComponent: assetsFolderInnerfileName];
-                /// 删除之前老的，直接用新的
-                if ([fm fileExistsAtPath: assetsFolderInnerfileNewFilePath]) {
-                    [fm removeItemAtPath:assetsFolderInnerfileNewFilePath error:nil];
-                }
-                if (isFileExist) {
-                    
-                    if (isDir) {
-                        NSError *er = nil;
-                        [fm copyItemAtPath:assetsFolderInnerfilePath toPath: assetsFolderInnerfileNewFilePath error: &er];
-                        if (er != nil) {
-                            NSLog(@"---%@---", er.localizedDescription);
-                        }
-                    } else {
-                        [fm createDirectoryAtPath:makeFolderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
-                        NSLog(@"---%@---", makeFolderFilePath);
-                        
-                        [fm copyItemAtPath:assetsFolderInnerfilePath toPath:assetsFolderInnerfileNewFilePath error:nil];
-                    }
-                } else {
-                    [fm createDirectoryAtPath:makeFolderFilePath withIntermediateDirectories:YES attributes:nil error:nil];
-                    NSLog(@"---%@---", makeFolderFilePath);
-                    
-                    [fm copyItemAtPath:assetsFolderInnerfilePath toPath:assetsFolderInnerfileNewFilePath error:nil];
-                }
-                
-            }
-        }
-        
-    }
 }
 - (void)createJSONFileInImagesetFromCopyToFolderFilePath:(NSString *)copyToFolderFilePath {
     
@@ -449,7 +319,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 #pragma mark - get view add view
 - (NSXMLElement *)getSubViewElementInVCElement:(NSXMLElement *)vcElement {
     if (!vcElement) {
-        NSLog(@"未找到 %@", vcElement);
         return nil;
     }
     NSXMLElement *object = [vcElement firstElementByName:@"objects"];
@@ -461,7 +330,6 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 
 - (NSXMLElement *)getSubViewElementInElement:(NSXMLElement *)viewElement {
     if (!viewElement) {
-        NSLog(@"未找到 %@", viewElement);
         return nil;
     }
     NSXMLElement *subViewSuperView = [viewElement firstElementByName:@"subviews"];
@@ -470,11 +338,9 @@ void copyFileToPath(NSString *copyFilePath, NSString *filePath, BOOL needRemoveO
 
 - (void)addSubviewElement:(NSXMLElement *)subViewElement inVCElement:(NSXMLElement *)vcElement fromSbDocument:(NSXMLDocument *)sbDocument{
     if (!subViewElement) {
-        NSLog(@"未找到 %@", subViewElement);
         return;
     }
     if (!vcElement) {
-        NSLog(@"未找到 %@", vcElement);
         return;
     }
     NSXMLElement *object = [vcElement firstElementByName:@"objects" ];

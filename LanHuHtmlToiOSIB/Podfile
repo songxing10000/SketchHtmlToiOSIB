@@ -1,10 +1,17 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :osx, '10.14'
+platform :osx, '10.15'
 inhibit_all_warnings!
 
 target "LanHuHtmlToiOSIB" do
 
 	pod 'YYModel', '~> 1.0.4', :inhibit_warnings => true
   
+end
+post_install do |installer|
+  installer.pod_target_subprojects.flat_map { |p| p.targets }.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.15'
+    end
+  end
 end

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -705,13 +706,81 @@
         <scene sceneID="hIz-AP-VOD">
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl" customClass="XMDragView">
+                    <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PPC-hF-heb">
+                                <rect key="frame" x="15" y="190" width="450" height="60"/>
+                                <clipView key="contentView" drawsBackground="NO" id="NMw-qX-rIx">
+                                    <rect key="frame" x="0.0" y="0.0" width="435" height="60"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="v02-aY-8n5">
+                                            <rect key="frame" x="0.0" y="0.0" width="435" height="60"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="textColor" red="0.14680000000000001" green="0.57081999999999999" blue="0.52502000000000004" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="435" height="60"/>
+                                            <size key="maxSize" width="435" height="10000000"/>
+                                            <attributedString key="textStorage">
+                                                <fragment content="https://alipic.lanhuapp.com/psx77zijxzrtx7uu3srhdimtctkgzknsmmb2bf8d20-51aa-4ddd-92dd-2d3c8e4abae3">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="0.01592" green="0.12651999999999999" blue="0.15970000000000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                        <color key="NSColor" red="0.14680000000000001" green="0.57081999999999999" blue="0.52502000000000004" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                        <font key="NSFont" size="14" name="Menlo-Regular"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" defaultTabInterval="34.600000000000001" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                            <tabStops>
+                                                                <textTab alignment="left" location="34.599998474121094">
+                                                                    <options/>
+                                                                </textTab>
+                                                            </tabStops>
+                                                        </paragraphStyle>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="t65-9x-U5m"/>
+                                </constraints>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="xad-rI-OaP">
+                                    <rect key="frame" x="-100" y="-100" width="225" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="jPr-e9-OJ7">
+                                    <rect key="frame" x="435" y="0.0" width="15" height="60"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ckx-yp-Qh7">
+                                <rect key="frame" x="384" y="13" width="88" height="32"/>
+                                <buttonCell key="cell" type="push" title="尝试生成" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Eoa-b4-Vah">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" size="13" name=".PingFangSC-Regular"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="clickTryToBuildBtn:" target="XfG-lQ-9wD" id="vaP-6J-4kr"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="PPC-hF-heb" secondAttribute="trailing" constant="15" id="FQf-tm-Xnf"/>
+                            <constraint firstAttribute="trailing" secondItem="ckx-yp-Qh7" secondAttribute="trailing" constant="15" id="IGK-me-esA"/>
+                            <constraint firstItem="PPC-hF-heb" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="eWk-Dg-TUA"/>
+                            <constraint firstItem="PPC-hF-heb" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="15" id="hYq-yu-jMb"/>
+                            <constraint firstAttribute="bottom" secondItem="ckx-yp-Qh7" secondAttribute="bottom" constant="20" symbolic="YES" id="ot5-Za-noV"/>
+                        </constraints>
                         <connections>
                             <outlet property="delegate" destination="XfG-lQ-9wD" id="Eqy-i5-iPT"/>
                         </connections>
                     </view>
+                    <connections>
+                        <outlet property="m_textView" destination="v02-aY-8n5" id="SSf-uO-adv"/>
+                        <outlet property="m_tryToBuildBtn" destination="ckx-yp-Qh7" id="gAt-RP-AyW"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

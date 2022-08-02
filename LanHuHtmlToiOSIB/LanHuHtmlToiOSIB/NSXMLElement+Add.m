@@ -328,7 +328,8 @@ static const char skRectKey = '\0';
             [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
             
         } else if([fontStyleName isEqualToString: @"PingFangSC-Semibold"] ||
-                  [fontStyleName isEqualToString: @"PingFang-SC-Bold"]) {
+                  [fontStyleName isEqualToString: @"PingFang-SC-Bold"] ||
+                  [fontStyleName isEqualToString: @"PingFangSC-Bold"]) {
             [fontDescription m_setValue:@"PingFangSC-Semibold" forKey: @"name"];
             [fontDescription m_setValue:@"PingFang SC" forKey: @"family"];
         } else if([fontStyleName isEqualToString: @"PingFangSC-Light"]) {
@@ -427,7 +428,7 @@ static const char skRectKey = '\0';
         aNewWillBeAddedViewElement = viewElement;
     }
     else {
-        
+        // backgroundLayer layer shapeLayer adjustmentLayer
         NSLog(@"--未知类型控件--%@---", viewType);
     }
     aNewWillBeAddedViewElement.skRect = view.bounds;
